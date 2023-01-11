@@ -1,6 +1,9 @@
 package ir.maktab.homeservicecompany.models.worker.service;
 
-import ir.maktab.homeservicecompany.models.client.entity.Client;
+import ir.maktab.homeservicecompany.models.job.entity.Job;
+import ir.maktab.homeservicecompany.models.job.service.JobService;
+import ir.maktab.homeservicecompany.models.worker_skill.entity.WorkerSkill;
+import ir.maktab.homeservicecompany.models.worker_skill.service.WorkerSkillService;
 import ir.maktab.homeservicecompany.utils.base.service.BaseServiceImpl;
 import ir.maktab.homeservicecompany.models.offer.entity.Offer;
 import ir.maktab.homeservicecompany.models.offer.service.OfferService;
@@ -8,6 +11,7 @@ import ir.maktab.homeservicecompany.models.worker.dao.WorkerDao;
 import ir.maktab.homeservicecompany.models.worker.dto.WorkerDto;
 import ir.maktab.homeservicecompany.models.worker.entity.Worker;
 import ir.maktab.homeservicecompany.utils.exception.InvalidIdException;
+import ir.maktab.homeservicecompany.utils.exception.NullIdException;
 import ir.maktab.homeservicecompany.utils.validation.Validation;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -27,13 +31,16 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
     @PersistenceContext
     private EntityManager em;
 
-    public WorkerSerImpl(WorkerDao repository, @Lazy OfferService offerSer, Validation validation) {
+    public WorkerSerImpl(WorkerDao repository, @Lazy OfferService offerSer, JobService jobSer, WorkerSkillService workerSkillSer, Validation validation) {
         super(repository);
         this.offerSer = offerSer;
+        this.jobSer = jobSer;
+        this.workerSkillSer = workerSkillSer;
         this.validation = validation;
     }
-
     private final OfferService offerSer;
+    private final JobService jobSer;
+    private final WorkerSkillService workerSkillSer;
     private final Validation validation;
 
     @Override
@@ -80,6 +87,21 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
         predicateList.toArray(predicates);
         query.select(root).where(predicates);
         return em.createQuery(query).getResultList();
+    }
+
+    @Override
+    public WorkerSkill addSkill(Long workerId,Long jobId) {
+        if (workerId==null)
+            throw new NullIdException("worker id cannot be null.");
+        if (jobId==null)
+            throw new NullIdException("job id cannot be null.");
+        Worker worker = findById(workerId);
+        Job job = jobSer.findById(jobId);
+        if (workerSkillSer.existsByWorkerAndJob(worker,job))
+            throw new IllegalArgumentException("this skill has already added for this worker.");
+        WorkerSkill workerSkill= new WorkerSkill(worker,job);
+        System.out.println(workerSkill);
+        return workerSkillSer.saveOrUpdate(workerSkill);
     }
 
     private void createPredicates(WorkerDto workerDto, List<Predicate> predicateList, CriteriaBuilder criteriaBuilder, Root<Worker> root) {

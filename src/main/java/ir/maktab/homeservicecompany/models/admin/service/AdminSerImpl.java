@@ -65,13 +65,13 @@ public class AdminSerImpl extends BaseServiceImpl<Admin, AdminDao> implements Ad
     }
 
     @Override
-    public void permitWorkerSkill(WorkerSkill workerSkill) {
-        workerSkillSer.permitWorkerSkill(workerSkill);
+    public void permitWorkerSkill(Long id) {
+        workerSkillSer.permitWorkerSkill(id);
     }
 
     @Override
-    public void banWorkerSkill(WorkerSkill workerSkill) {
-        workerSkillSer.banWorkerSkill(workerSkill);
+    public void banWorkerSkill(Long id) {
+        workerSkillSer.banWorkerSkill(id);
     }
 
     @Override

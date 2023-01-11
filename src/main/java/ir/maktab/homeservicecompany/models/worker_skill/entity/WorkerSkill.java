@@ -6,14 +6,18 @@ import ir.maktab.homeservicecompany.utils.base.entity.BaseEntity;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
+@ToString
 @NotNull
 public class WorkerSkill extends BaseEntity {
 
@@ -24,14 +28,9 @@ public class WorkerSkill extends BaseEntity {
         this.confirmedByAdmin = null;
     }
 
-   /* @EmbeddedId
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private WorkerSkillId id;*/
     @ManyToOne()
-    @MapsId("workerId")
     private Worker worker;
     @ManyToOne
-    @MapsId("jobId")
     private Job job;
     private LocalDateTime requestedAt;
     @Nullable

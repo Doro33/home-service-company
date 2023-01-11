@@ -21,12 +21,10 @@ public interface AdminService extends BaseService<Admin> {
     Job addNewJob(Job job);
 
     List<Job> findAllJobs();
-    void permitWorkerSkill(WorkerSkill workerSkill);
+    void permitWorkerSkill(Long id);
 
-    void banWorkerSkill(WorkerSkill workerSkill);
+    void banWorkerSkill(Long id);
     List<Client> clientCriteria(ClientDTO clientDto);
 
     List<Worker> workerCriteria(WorkerDto workerDto);
-
-
 }

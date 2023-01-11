@@ -1,9 +1,8 @@
 package ir.maktab.homeservicecompany.models.client.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 public class ClientDTO {
     private String firstName;
     private String lastName;

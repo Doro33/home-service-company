@@ -3,23 +3,19 @@ package ir.maktab.homeservicecompany.models.worker_skill.service;
 import ir.maktab.homeservicecompany.models.job.entity.Job;
 import ir.maktab.homeservicecompany.models.worker.entity.Worker;
 import ir.maktab.homeservicecompany.models.worker_skill.entity.WorkerSkill;
+import ir.maktab.homeservicecompany.utils.base.service.BaseService;
 
 import java.util.List;
 
-public interface WorkerSkillService  {
-    WorkerSkill saveOrUpdate(WorkerSkill workerSkill);
+public interface WorkerSkillService extends BaseService<WorkerSkill> {
 
-    void delete(WorkerSkill workerSkill);
+    void permitWorkerSkill(Long id);
 
-    WorkerSkill findById(Long id);
-
-    List<WorkerSkill> findAll();
-
-    void permitWorkerSkill(WorkerSkill workerSkill);
-
-    void banWorkerSkill(WorkerSkill workerSkill);
+    void banWorkerSkill(Long id);
 
     List<WorkerSkill> findByWorker(Worker worker);
 
     List<Job> findWorkerSkills(Worker worker);
+
+    boolean existsByWorkerAndJob(Worker worker, Job job);
 }

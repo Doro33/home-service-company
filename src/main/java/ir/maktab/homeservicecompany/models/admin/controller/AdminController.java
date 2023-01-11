@@ -41,4 +41,14 @@ public class AdminController {
                 jobDTO.getDescription());
         adminSer.addNewJob(job);
     }
+
+    @PutMapping("permitWorkerSkill/{id}")
+    public void permitWorkerSkill(@PathVariable Long id){
+        adminSer.permitWorkerSkill(id);
+    }
+
+    @PutMapping("banWorkerSkill/{id}")
+    public void banWorkerSkill(@PathVariable Long id){
+        adminSer.banWorkerSkill(id);
+    }
 }

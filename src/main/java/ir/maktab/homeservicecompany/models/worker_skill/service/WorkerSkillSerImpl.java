@@ -1,7 +1,10 @@
 package ir.maktab.homeservicecompany.models.worker_skill.service;
 
 import ir.maktab.homeservicecompany.models.job.entity.Job;
+import ir.maktab.homeservicecompany.models.worker.entity.WorkerStatus;
 import ir.maktab.homeservicecompany.models.worker_skill.dao.WorkerSkillDao;
+import ir.maktab.homeservicecompany.utils.base.service.BaseServiceImpl;
+import ir.maktab.homeservicecompany.utils.exception.AdminPermitException;
 import ir.maktab.homeservicecompany.utils.exception.InvalidIdException;
 import ir.maktab.homeservicecompany.utils.exception.NullIdException;
 import ir.maktab.homeservicecompany.models.worker.entity.Worker;
@@ -12,52 +15,30 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-public class WorkerSkillSerImpl implements WorkerSkillService{
-    private final WorkerSkillDao repository;
+public class WorkerSkillSerImpl extends BaseServiceImpl<WorkerSkill,WorkerSkillDao> implements WorkerSkillService{
 
     public WorkerSkillSerImpl(WorkerSkillDao repository) {
-        this.repository = repository;
+        super(repository);
     }
 
     @Override
-    @Transactional
-    public WorkerSkill saveOrUpdate(WorkerSkill workerSkill) {
-        return repository.save(workerSkill);
-    }
-
-    @Override
-    public void delete(WorkerSkill workerSkill) {
-        repository.delete(workerSkill);
-    }
-
-    @Override
-    public WorkerSkill findById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new InvalidIdException("This id is not valid."));
-    }
-
-    @Override
-    public List<WorkerSkill> findAll() {
-        return repository.findAll();
-    }
-
-    @Override
-    public void permitWorkerSkill(WorkerSkill workerSkill) {
-        if (workerSkill.getId()==null)
+    public void permitWorkerSkill(Long id) {
+        if (id==null)
             throw new NullIdException("workerSkill id cannot be null.");
-        else{
-            workerSkill.setConfirmedByAdmin(true);
-            saveOrUpdate(workerSkill);
-        }
+        WorkerSkill workerSkill = findById(id);
+        if (workerSkill.getWorker().getStatus()!= WorkerStatus.CONFIRMED)
+            throw new AdminPermitException("worker is not confirmed.");
+        workerSkill.setConfirmedByAdmin(true);
+        saveOrUpdate(workerSkill);
     }
 
     @Override
-    public void banWorkerSkill(WorkerSkill workerSkill) {
-        if (workerSkill.getId()==null)
+    public void banWorkerSkill(Long id) {
+        if (id==null)
             throw new NullIdException("workerSkill id cannot be null.");
-        else{
-            workerSkill.setConfirmedByAdmin(false);
-            saveOrUpdate(workerSkill);
-        }
+        WorkerSkill workerSkill = findById(id);
+        workerSkill.setConfirmedByAdmin(false);
+        saveOrUpdate(workerSkill);
     }
 
     @Override
@@ -68,5 +49,10 @@ public class WorkerSkillSerImpl implements WorkerSkillService{
     @Override
     public List<Job> findWorkerSkills(Worker worker) {
         return findByWorker(worker).stream().map(WorkerSkill::getJob).toList();
+    }
+
+    @Override
+    public boolean existsByWorkerAndJob(Worker worker, Job job) {
+        return repository.existsByWorkerAndJob(worker,job);
     }
 }

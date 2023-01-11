@@ -1,6 +1,7 @@
 package ir.maktab.homeservicecompany.models.worker.service;
 
 import ir.maktab.homeservicecompany.models.client.entity.Client;
+import ir.maktab.homeservicecompany.models.worker_skill.entity.WorkerSkill;
 import ir.maktab.homeservicecompany.utils.base.service.BaseService;
 import ir.maktab.homeservicecompany.models.offer.entity.Offer;
 import ir.maktab.homeservicecompany.models.worker.dto.WorkerDto;
@@ -19,5 +20,7 @@ public interface WorkerService extends BaseService<Worker> {
     Offer addOffer(Offer offer);
 
     List<Worker> workerCriteria(WorkerDto workerDto);
+
+    WorkerSkill addSkill(Long workerId,Long jobId);
 
 }

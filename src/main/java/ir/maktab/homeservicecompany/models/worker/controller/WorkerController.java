@@ -3,6 +3,7 @@ package ir.maktab.homeservicecompany.models.worker.controller;
 import ir.maktab.homeservicecompany.models.worker.dto.WorkerDto;
 import ir.maktab.homeservicecompany.models.worker.entity.Worker;
 import ir.maktab.homeservicecompany.models.worker.service.WorkerService;
+import ir.maktab.homeservicecompany.models.worker_skill.dto.WorkerSkillDTO;
 import ir.maktab.homeservicecompany.utils.dto.PasswordDTO;
 import ir.maktab.homeservicecompany.utils.validation.Validation;
 import lombok.RequiredArgsConstructor;
@@ -45,5 +46,11 @@ public class WorkerController {
                 passwordDTO.getOldPassword(),
                 passwordDTO.getNewPassword1(),
                 passwordDTO.getNewPassword2());
+    }
+
+    @PostMapping("/addSkill")
+    @ResponseBody
+    void addSkill(@RequestBody WorkerSkillDTO workerSkillDTO){
+        workerSer.addSkill(workerSkillDTO.getWorkerId(), workerSkillDTO.getJobId());
     }
 }

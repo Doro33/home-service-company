@@ -15,7 +15,6 @@ public class ClientController {
     private final ClientService clientSer;
 
     @PostMapping("/signup")
-    @ResponseBody
     void signUp(@RequestBody ClientDTO clientDTO) {
         clientSer.signUp(
                 new Client(
@@ -26,7 +25,6 @@ public class ClientController {
     }
 
     @PutMapping("/changePassword")
-    @ResponseBody
     void changePassword(@RequestBody PasswordDTO passwordDTO) {
         clientSer.changePassword(
                 passwordDTO.getEmail(),
