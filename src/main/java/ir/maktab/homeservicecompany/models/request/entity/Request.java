@@ -43,6 +43,7 @@ public class Request extends BaseEntity {
     private Job job;
     @Positive
     private Double proposedPrice;
+    @Nullable
     private String description;
     private LocalDate date;
     private LocalTime suggestedTime;

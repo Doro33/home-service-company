@@ -1,5 +1,6 @@
 package ir.maktab.homeservicecompany.models.client.service;
 
+import ir.maktab.homeservicecompany.models.request.dto.RequestDTO;
 import ir.maktab.homeservicecompany.utils.base.service.BaseService;
 import ir.maktab.homeservicecompany.models.client.dto.ClientDTO;
 import ir.maktab.homeservicecompany.models.client.entity.Client;
@@ -15,7 +16,7 @@ public interface ClientService extends BaseService<Client> {
 
     Client changePassword(String email, String oldPassword, String newPassword1, String newPassword2);
 
-    Request addRequest(Request request);
+    Request addRequest(RequestDTO requestDTO);
 
     List<Offer> findOfferByRequestOrderByPrice(Request request);
     List<Offer> findOfferByRequestOrderByScore(Request request);

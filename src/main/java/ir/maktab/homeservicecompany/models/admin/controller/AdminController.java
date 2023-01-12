@@ -17,15 +17,7 @@ public class AdminController {
         this.adminSer = adminSer;
     }
 
-    @GetMapping("/findAllCategories")
-    public List<Category> findAllCategories() {
-        return adminSer.findAllCategories();
-    }
 
-    @GetMapping("/findAllJobs")
-    public List<Job> findAllJob() {
-        return adminSer.findAllJobs();
-    }
 
     @PostMapping("/addCategory")
     public void addCategory(@RequestBody Category category) {

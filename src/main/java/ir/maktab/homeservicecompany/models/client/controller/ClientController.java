@@ -3,6 +3,7 @@ package ir.maktab.homeservicecompany.models.client.controller;
 import ir.maktab.homeservicecompany.models.client.dto.ClientDTO;
 import ir.maktab.homeservicecompany.models.client.entity.Client;
 import ir.maktab.homeservicecompany.models.client.service.ClientService;
+import ir.maktab.homeservicecompany.models.request.dto.RequestDTO;
 import ir.maktab.homeservicecompany.utils.dto.PasswordDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -14,16 +15,6 @@ import org.springframework.web.bind.annotation.*;
 public class ClientController {
     private final ClientService clientSer;
 
-    @PostMapping("/signup")
-    void signUp(@RequestBody ClientDTO clientDTO) {
-        clientSer.signUp(
-                new Client(
-                clientDTO.getFirstName(),
-                clientDTO.getLastName(),
-                clientDTO.getEmail(),
-                clientDTO.getPassword()));
-    }
-
     @PutMapping("/changePassword")
     void changePassword(@RequestBody PasswordDTO passwordDTO) {
         clientSer.changePassword(
@@ -31,5 +22,10 @@ public class ClientController {
                 passwordDTO.getOldPassword(),
                 passwordDTO.getNewPassword1(),
                 passwordDTO.getNewPassword2());
+    }
+
+    @PostMapping("/addRequest")
+    void addRequest(@RequestBody RequestDTO requestDTO){
+        clientSer.addRequest(requestDTO);
     }
 }

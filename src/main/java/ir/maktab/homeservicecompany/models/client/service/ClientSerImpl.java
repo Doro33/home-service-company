@@ -3,6 +3,7 @@ package ir.maktab.homeservicecompany.models.client.service;
 import com.google.common.base.Strings;
 import ir.maktab.homeservicecompany.models.admin.service.AdminService;
 import ir.maktab.homeservicecompany.models.offer.service.OfferService;
+import ir.maktab.homeservicecompany.models.request.dto.RequestDTO;
 import ir.maktab.homeservicecompany.models.request.entity.RequestStatus;
 import ir.maktab.homeservicecompany.models.request.service.RequestService;
 import ir.maktab.homeservicecompany.models.worker.service.WorkerService;
@@ -87,9 +88,9 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
     }
 
     @Override
-    public Request addRequest(Request request) {
+    public Request addRequest(RequestDTO requestDTO) {
 
-        return requestSer.saveNewRequest(request);
+        return requestSer.saveNewRequest(requestDTO);
     }
 
     @Override

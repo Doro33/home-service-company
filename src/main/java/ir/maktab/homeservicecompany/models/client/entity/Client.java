@@ -24,7 +24,7 @@ public class Client extends BaseEntity {
                 this.password = password;
                 this.createdAt = LocalDateTime.now();
                 this.credit = 0D;
-                this.orderCounter=0;
+                this.requestCounter =0;
         }
 
         private String firstName;
@@ -40,5 +40,5 @@ public class Client extends BaseEntity {
         private String password;
         private LocalDateTime createdAt;
         private Double credit;
-        private Integer orderCounter;
+        private Integer requestCounter;
     }
