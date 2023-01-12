@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Service
 public class RequestSerImpl extends BaseServiceImpl<Request, RequestDao> implements RequestService {
@@ -32,13 +33,17 @@ public class RequestSerImpl extends BaseServiceImpl<Request, RequestDao> impleme
         Job job = jobValidation(requestDTO.getJobId());
         Request request = requestMaker(requestDTO, client, job);
 
-
-
         client.setRequestCounter(
                 client.getRequestCounter()+1
         );
         clientSer.saveOrUpdate(client);
         return saveOrUpdate(request);
+    }
+
+    @Override
+    public List<Request> findByJob(Long jobId) {
+        Job job = jobSer.findById(jobId);
+        return repository.findByJobAndAcceptedOfferIsNullOrderByDate(job);
     }
 
     private static Request requestMaker(RequestDTO requestDTO, Client client, Job job) {
@@ -69,8 +74,6 @@ public class RequestSerImpl extends BaseServiceImpl<Request, RequestDao> impleme
         if (clientId == null) throw new NullIdException("client's id cannot be null.");
         Client client = clientSer.findById(clientId);
         if (client == null) throw new IllegalArgumentException("client's id is not valid.");
-
-        System.out.println(client);
         return client;
     }
 }

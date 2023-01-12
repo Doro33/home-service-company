@@ -55,4 +55,9 @@ public class WorkerSkillSerImpl extends BaseServiceImpl<WorkerSkill,WorkerSkillD
     public boolean existsByWorkerAndJob(Worker worker, Job job) {
         return repository.existsByWorkerAndJob(worker,job);
     }
+
+    @Override
+    public boolean canWorkerDoThisJob(Worker worker, Job job) {
+        return repository.existsByWorkerAndJobAndConfirmedByAdminIsTrue(worker, job);
+    }
 }

@@ -6,6 +6,7 @@ import ir.maktab.homeservicecompany.utils.base.service.BaseService;
 import ir.maktab.homeservicecompany.models.offer.entity.Offer;
 import ir.maktab.homeservicecompany.models.worker.dto.WorkerDto;
 import ir.maktab.homeservicecompany.models.worker.entity.Worker;
+import ir.maktab.homeservicecompany.utils.dto.PasswordDTO;
 
 import java.util.List;
 
@@ -13,13 +14,12 @@ public interface WorkerService extends BaseService<Worker> {
 
     Worker findByEmail(String email);
 
-    Worker changePassword(String email, String oldPassword, String newPassword1, String newPassword2);
+    Worker changePassword(PasswordDTO passwordDTO);
 
 
     Worker signUp(Worker worker);
 
     Worker confirmWorker(Long id);
-    Offer addOffer(Offer offer);
 
     List<Worker> workerCriteria(WorkerDto workerDto);
 

@@ -2,6 +2,7 @@ package ir.maktab.homeservicecompany.models.offer.dao;
 
 import ir.maktab.homeservicecompany.models.request.entity.Request;
 import ir.maktab.homeservicecompany.models.offer.entity.Offer;
+import ir.maktab.homeservicecompany.models.worker.entity.Worker;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -17,4 +18,6 @@ public interface OfferDao extends JpaRepository<Offer,Long> {
            order by o.worker.score
 """)
     List<Offer> findByRequestOrderByWorkerScore(Long requestId);
+
+    boolean existsByWorkerAndRequest(Worker worker, Request request);
 }

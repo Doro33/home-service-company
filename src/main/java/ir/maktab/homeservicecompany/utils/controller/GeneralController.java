@@ -7,6 +7,8 @@ import ir.maktab.homeservicecompany.models.client.entity.Client;
 import ir.maktab.homeservicecompany.models.client.service.ClientService;
 import ir.maktab.homeservicecompany.models.job.entity.Job;
 import ir.maktab.homeservicecompany.models.job.service.JobService;
+import ir.maktab.homeservicecompany.models.request.entity.Request;
+import ir.maktab.homeservicecompany.models.request.service.RequestService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,10 +20,13 @@ public class GeneralController {
     private final JobService jobSer;
     private final ClientService clientSer;
 
-    public GeneralController(CategoryService categorySer, JobService jobSer, ClientService clientSer) {
+    private final RequestService requestSer;
+
+    public GeneralController(CategoryService categorySer, JobService jobSer, ClientService clientSer, RequestService requestSer) {
         this.categorySer = categorySer;
         this.jobSer = jobSer;
         this.clientSer = clientSer;
+        this.requestSer = requestSer;
     }
 
     @GetMapping("/findAllCategories")
@@ -35,12 +40,17 @@ public class GeneralController {
     }
 
     @PostMapping("/clientSignup")
-    void clientSignUp(@RequestBody ClientDTO clientDTO) {
+    public void clientSignUp(@RequestBody ClientDTO clientDTO) {
         clientSer.signUp(
                 new Client(
                         clientDTO.getFirstName(),
                         clientDTO.getLastName(),
                         clientDTO.getEmail(),
                         clientDTO.getPassword()));
+    }
+
+    @GetMapping("findRequestsByJob/{id}")
+    public List<Request> findRequestsByJobId(@PathVariable Long id){
+        return requestSer.findByJob(id);
     }
 }

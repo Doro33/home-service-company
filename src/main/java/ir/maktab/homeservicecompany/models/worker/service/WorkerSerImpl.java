@@ -11,6 +11,7 @@ import ir.maktab.homeservicecompany.models.offer.service.OfferService;
 import ir.maktab.homeservicecompany.models.worker.dao.WorkerDao;
 import ir.maktab.homeservicecompany.models.worker.dto.WorkerDto;
 import ir.maktab.homeservicecompany.models.worker.entity.Worker;
+import ir.maktab.homeservicecompany.utils.dto.PasswordDTO;
 import ir.maktab.homeservicecompany.utils.exception.AdminPermitException;
 import ir.maktab.homeservicecompany.utils.exception.InvalidIdException;
 import ir.maktab.homeservicecompany.utils.exception.NullIdException;
@@ -51,8 +52,13 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
     }
 
     @Override
-    public Worker changePassword(String email, String oldPassword, String newPassword1, String newPassword2) {
+    public Worker changePassword(PasswordDTO passwordDTO) {
+        String email= passwordDTO.getEmail();
+        String oldPassword = passwordDTO.getOldPassword();
+        String newPassword1 = passwordDTO.getNewPassword1();
+        String newPassword2 = passwordDTO.getNewPassword2();
         Worker worker = findByEmail(email);
+
         if (worker == null)
             throw new IllegalArgumentException("this email does not have an account.");
         if (!oldPassword.equals(worker.getPassword()))
@@ -85,12 +91,6 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
         worker.setStatus(WorkerStatus.CONFIRMED);
         return saveOrUpdate(worker);
     }
-
-    @Override
-    public Offer addOffer(Offer offer) {
-        return offerSer.saveNewOffer(offer);
-    }
-
     @Override
     public List<Worker> workerCriteria(WorkerDto workerDto) {
         List<Predicate> predicateList = new ArrayList<>();

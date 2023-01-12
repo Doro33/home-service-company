@@ -1,5 +1,6 @@
 package ir.maktab.homeservicecompany.models.client.service;
 
+import ir.maktab.homeservicecompany.models.offer.dto.ChooseOfferDTO;
 import ir.maktab.homeservicecompany.models.request.dto.RequestDTO;
 import ir.maktab.homeservicecompany.utils.base.service.BaseService;
 import ir.maktab.homeservicecompany.models.client.dto.ClientDTO;
@@ -16,15 +17,13 @@ public interface ClientService extends BaseService<Client> {
 
     Client changePassword(String email, String oldPassword, String newPassword1, String newPassword2);
 
-    Request addRequest(RequestDTO requestDTO);
-
     List<Offer> findOfferByRequestOrderByPrice(Request request);
     List<Offer> findOfferByRequestOrderByScore(Request request);
 
-    void setRequestStatusOnStarted(Request request);
-    void setRequestStatusOnCompleted(Request request);
+    void setRequestStatusOnStarted(Long clientId, Long requestId);
+    void setRequestStatusOnCompleted(Long clientId, Long requestId);
 
-    void chooseAnOffer(Client client,Request request, Offer offer);
+    void chooseAnOffer(ChooseOfferDTO chooseOfferDTO);
 
     void payWithCredit(Client client, Request request);
 

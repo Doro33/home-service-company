@@ -2,6 +2,7 @@ package ir.maktab.homeservicecompany.models.client.service;
 
 import com.google.common.base.Strings;
 import ir.maktab.homeservicecompany.models.admin.service.AdminService;
+import ir.maktab.homeservicecompany.models.offer.dto.ChooseOfferDTO;
 import ir.maktab.homeservicecompany.models.offer.service.OfferService;
 import ir.maktab.homeservicecompany.models.request.dto.RequestDTO;
 import ir.maktab.homeservicecompany.models.request.entity.RequestStatus;
@@ -87,11 +88,6 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         return saveOrUpdate(client);
     }
 
-    @Override
-    public Request addRequest(RequestDTO requestDTO) {
-
-        return requestSer.saveNewRequest(requestDTO);
-    }
 
     @Override
     public List<Offer> findOfferByRequestOrderByPrice(Request request) {
@@ -104,8 +100,11 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
     }
 
     @Override
-    public void setRequestStatusOnStarted(Request request) {
-        requestValidation(request);
+    public void setRequestStatusOnStarted(Long clientId, Long requestId) {
+        Client client = clientValidation(clientId);
+        Request request = requestValidation(requestId);
+        if (request.getClient()!=client)
+            throw new IllegalArgumentException("request doesn't belong to this client.");
         if (request.getStatus() != RequestStatus.WORKER_ON_THE_ROAD)
             throw new RequestStatusException("incorrect request's status for this function.");
         request.setStatus(RequestStatus.STARTED);
@@ -115,8 +114,11 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
 
     @Override
     @Transactional
-    public void setRequestStatusOnCompleted(Request request) {
-        requestValidation(request);
+    public void setRequestStatusOnCompleted(Long clientId, Long requestId) {
+        Client client = clientValidation(clientId);
+        Request request = requestValidation(requestId);
+        if (request.getClient()!=client)
+            throw new IllegalArgumentException("request doesn't belong to this client.");
         if (request.getStatus() != RequestStatus.STARTED)
             throw new RequestStatusException("incorrect request's status for this function.");
         request.setStatus(RequestStatus.COMPLETED);
@@ -129,30 +131,22 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         }
         requestSer.saveOrUpdate(request);
     }
-
-    private static Long extraHoursCalculator(Request request) {
-        Duration actualDuration = Duration.between(request.getStartAt(), request.getEndAt());
-        Duration expectedDuration = request.getAcceptedOffer().getExpectedDuration();
-        Duration extraDuration = actualDuration.minus(expectedDuration);
-        return extraDuration.toHours();
-    }
-
     @Override
     @Transactional
-    public void chooseAnOffer(Client client, Request request, Offer offer) {
-        clientValidation(client);
-        requestValidation(request);
-        offerValidation(offer);
+    public void chooseAnOffer(ChooseOfferDTO chooseOfferDTO) {
+        Client client = clientValidation(chooseOfferDTO.getClientId());
+        Request request = requestValidation(chooseOfferDTO.getRequestId());
+        Offer offer = offerValidation(chooseOfferDTO.getOfferId());
         if (request.getClient() != client)
             throw new IllegalArgumentException("request doesn't belong to this client.");
         if (offer.getRequest() != request)
             throw new IllegalArgumentException("offer doesnt belong to this request");
 
         offer.setClientAccepted(true);
+        offerSer.saveOrUpdate(offer);
+
         request.setAcceptedOffer(offer);
         request.setStatus(RequestStatus.WORKER_ON_THE_ROAD);
-
-        offerSer.saveOrUpdate(offer);
         requestSer.saveOrUpdate(request);
     }
 
@@ -164,8 +158,8 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         Double workPrice = acceptedOffer.getExpectedPrice();
         Worker worker = acceptedOffer.getWorker();
 
-        clientValidation(client);
-        requestValidation(request);
+        clientValidation(client.getId());
+        requestValidation(request.getId());
 
         if (request.getClient() != client)
             throw new IllegalArgumentException("request doesn't belong to this client.");
@@ -199,25 +193,38 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         return em.createQuery(query).getResultList();
     }
 
-    private void clientValidation(Client client) {
-        if (client.getId() == null)
+    private Client clientValidation(Long clientId) {
+        if (clientId == null)
             throw new NullIdException("client's id cannot be null.");
-        if (findById(client.getId()) == null)
+        Client client = findById(clientId);
+        if (client == null)
             throw new IllegalArgumentException("client's id is not valid.");
+        return client;
     }
 
-    private void requestValidation(Request request) {
-        if (request.getId() == null)
+    private Request requestValidation(Long requestId) {
+        if (requestId == null)
             throw new NullIdException("request's id cannot be null.");
-        if (requestSer.findById(request.getId()) == null)
+        Request request = requestSer.findById(requestId);
+        if (request == null)
             throw new IllegalArgumentException("request's id is not valid.");
+        return request;
     }
 
-    private void offerValidation(Offer offer) {
-        if (offer.getId() == null)
+    private Offer offerValidation(Long offerId) {
+        if (offerId == null)
             throw new NullIdException("offer's id cannot be null.");
-        if (offerSer.findById(offer.getId()) == null)
+        Offer offer = offerSer.findById(offerId);
+        if (offer == null)
             throw new IllegalArgumentException("offer's id is not valid.");
+        return offer;
+    }
+
+    private static Long extraHoursCalculator(Request request) {
+        Duration actualDuration = Duration.between(request.getStartAt(), request.getEndAt());
+        Duration expectedDuration = request.getAcceptedOffer().getExpectedDuration();
+        Duration extraDuration = actualDuration.minus(expectedDuration);
+        return extraDuration.toHours();
     }
 
 

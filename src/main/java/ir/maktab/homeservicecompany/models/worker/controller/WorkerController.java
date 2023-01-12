@@ -1,5 +1,7 @@
 package ir.maktab.homeservicecompany.models.worker.controller;
 
+import ir.maktab.homeservicecompany.models.offer.dto.OfferDTO;
+import ir.maktab.homeservicecompany.models.offer.service.OfferService;
 import ir.maktab.homeservicecompany.models.worker.dto.WorkerDto;
 import ir.maktab.homeservicecompany.models.worker.entity.Worker;
 import ir.maktab.homeservicecompany.models.worker.service.WorkerService;
@@ -17,6 +19,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class WorkerController {
     private final WorkerService workerSer;
+    private final OfferService offerSer;
     private final Validation validation;
 
     @PostMapping("/signup")
@@ -41,16 +44,18 @@ public class WorkerController {
     @PutMapping("/changePassword")
     @ResponseBody
     void changePassword(@RequestBody PasswordDTO passwordDTO) {
-        workerSer.changePassword(
-                passwordDTO.getEmail(),
-                passwordDTO.getOldPassword(),
-                passwordDTO.getNewPassword1(),
-                passwordDTO.getNewPassword2());
+        workerSer.changePassword(passwordDTO);
     }
 
     @PostMapping("/addSkill")
     @ResponseBody
     void addSkill(@RequestBody WorkerSkillDTO workerSkillDTO){
         workerSer.addSkill(workerSkillDTO.getWorkerId(), workerSkillDTO.getJobId());
+    }
+
+    @PostMapping("/addOffer")
+    @ResponseBody
+    public void addOffer(@RequestBody OfferDTO offerDTO){
+        offerSer.saveNewOffer(offerDTO);
     }
 }

@@ -18,4 +18,7 @@ public interface WorkerSkillService extends BaseService<WorkerSkill> {
     List<Job> findWorkerSkills(Worker worker);
 
     boolean existsByWorkerAndJob(Worker worker, Job job);
+
+    boolean canWorkerDoThisJob(Worker worker, Job job);
+
 }
