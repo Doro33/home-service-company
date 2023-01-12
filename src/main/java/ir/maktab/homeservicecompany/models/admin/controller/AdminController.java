@@ -28,7 +28,7 @@ public class AdminController {
     }
 
     @PostMapping("/addCategory")
-    public void save(@RequestBody Category category) {
+    public void addCategory(@RequestBody Category category) {
         adminSer.addNewCategory(category.getName());
     }
 
@@ -42,13 +42,25 @@ public class AdminController {
         adminSer.addNewJob(job);
     }
 
-    @PutMapping("permitWorkerSkill/{id}")
+    @PutMapping("/updateJob")
+    public void updateJob(@RequestBody JobDTO jobDTO){
+        adminSer.updateJob(jobDTO);
+    }
+
+    @PutMapping("/permitWorkerSkill/{id}")
     public void permitWorkerSkill(@PathVariable Long id){
         adminSer.permitWorkerSkill(id);
     }
 
-    @PutMapping("banWorkerSkill/{id}")
+    @PutMapping("/banWorkerSkill/{id}")
     public void banWorkerSkill(@PathVariable Long id){
         adminSer.banWorkerSkill(id);
     }
+
+    @PutMapping("/confirmWorker/{id}")
+    public void confirmWorker(@PathVariable Long id){
+        adminSer.confirmWorker(id);
+    }
+
+
 }

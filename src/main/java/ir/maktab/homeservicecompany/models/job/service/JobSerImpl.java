@@ -1,5 +1,6 @@
 package ir.maktab.homeservicecompany.models.job.service;
 
+import ir.maktab.homeservicecompany.models.job.dto.JobDTO;
 import ir.maktab.homeservicecompany.utils.base.service.BaseServiceImpl;
 import ir.maktab.homeservicecompany.models.category.entity.Category;
 import ir.maktab.homeservicecompany.models.category.service.CategoryService;
@@ -33,6 +34,19 @@ public class JobSerImpl extends BaseServiceImpl<Job, JobDao> implements JobServi
             throw new IllegalArgumentException("this job has already been added");
         if (job.getMinimumPrice()<=0)
             throw new IllegalArgumentException("minimum price cannot be lesser than 0.");
+        return saveOrUpdate(job);
+    }
+
+    @Override
+    public Job updateJob(JobDTO jobDTO) {
+        Job job=findByName(jobDTO.getJobName());
+        if (job == null)
+            throw new IllegalArgumentException("there is no job with this name");
+        if (jobDTO.getMinimumPrice()<=0)
+            throw new IllegalArgumentException("minimum price cannot be lesser than 0.");
+
+        job.setMinimumPrice(jobDTO.getMinimumPrice());
+        job.setDescription(jobDTO.getDescription());
         return saveOrUpdate(job);
     }
 

@@ -2,6 +2,7 @@ package ir.maktab.homeservicecompany.models.worker.service;
 
 import ir.maktab.homeservicecompany.models.job.entity.Job;
 import ir.maktab.homeservicecompany.models.job.service.JobService;
+import ir.maktab.homeservicecompany.models.worker.entity.WorkerStatus;
 import ir.maktab.homeservicecompany.models.worker_skill.entity.WorkerSkill;
 import ir.maktab.homeservicecompany.models.worker_skill.service.WorkerSkillService;
 import ir.maktab.homeservicecompany.utils.base.service.BaseServiceImpl;
@@ -10,6 +11,7 @@ import ir.maktab.homeservicecompany.models.offer.service.OfferService;
 import ir.maktab.homeservicecompany.models.worker.dao.WorkerDao;
 import ir.maktab.homeservicecompany.models.worker.dto.WorkerDto;
 import ir.maktab.homeservicecompany.models.worker.entity.Worker;
+import ir.maktab.homeservicecompany.utils.exception.AdminPermitException;
 import ir.maktab.homeservicecompany.utils.exception.InvalidIdException;
 import ir.maktab.homeservicecompany.utils.exception.NullIdException;
 import ir.maktab.homeservicecompany.utils.validation.Validation;
@@ -72,6 +74,19 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
     }
 
     @Override
+    public Worker confirmWorker(Long id) {
+        if (id==null)
+            throw new NullIdException("worker id cannot be null.");
+        Worker worker = findById(id);
+        if (worker.getStatus()== WorkerStatus.SUSPENDED)
+            throw new AdminPermitException("worker has been suspended.");
+        if (worker.getStatus()== WorkerStatus.CONFIRMED)
+            throw new AdminPermitException("worker has been already confirmed.");
+        worker.setStatus(WorkerStatus.CONFIRMED);
+        return saveOrUpdate(worker);
+    }
+
+    @Override
     public Offer addOffer(Offer offer) {
         return offerSer.saveNewOffer(offer);
     }
@@ -95,10 +110,15 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
             throw new NullIdException("worker id cannot be null.");
         if (jobId==null)
             throw new NullIdException("job id cannot be null.");
+
         Worker worker = findById(workerId);
         Job job = jobSer.findById(jobId);
+        if (worker.getStatus()!=WorkerStatus.CONFIRMED)
+            throw new IllegalArgumentException("worker has not been confirmed.");
+
         if (workerSkillSer.existsByWorkerAndJob(worker,job))
             throw new IllegalArgumentException("this skill has already added for this worker.");
+
         WorkerSkill workerSkill= new WorkerSkill(worker,job);
         System.out.println(workerSkill);
         return workerSkillSer.saveOrUpdate(workerSkill);

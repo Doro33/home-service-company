@@ -17,6 +17,8 @@ public interface WorkerService extends BaseService<Worker> {
 
 
     Worker signUp(Worker worker);
+
+    Worker confirmWorker(Long id);
     Offer addOffer(Offer offer);
 
     List<Worker> workerCriteria(WorkerDto workerDto);
