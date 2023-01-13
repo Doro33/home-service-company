@@ -1,5 +1,6 @@
 package ir.maktab.homeservicecompany.models.client.controller;
 
+import ir.maktab.homeservicecompany.models.bank_card.dto.MoneyTransferDTO;
 import ir.maktab.homeservicecompany.models.client.service.ClientService;
 import ir.maktab.homeservicecompany.models.comment.dto.CommentDTO;
 import ir.maktab.homeservicecompany.models.comment.service.CommentService;
@@ -73,6 +74,11 @@ public class ClientController {
     @PostMapping("/addComment")
     public void addComment(@RequestBody CommentDTO commentDTO){
         commentSer.addComment(commentDTO);
+    }
+
+    @PutMapping("/increaseCredit/{clientId}")
+    public void increaseCredit(@PathVariable Long clientId,@RequestBody MoneyTransferDTO moneyTransferDTO){
+        clientSer.increaseCredit(clientId,moneyTransferDTO);
     }
 
 }

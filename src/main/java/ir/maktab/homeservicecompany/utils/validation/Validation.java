@@ -64,44 +64,30 @@ public class Validation {
 
     public Client clientValidate(Long clientId) {
         if (clientId == null) throw new NullIdException("client's id cannot be null.");
-        Client client = clientSer.findById(clientId);
-        if (client == null) throw new IllegalArgumentException("client's id is not valid.");
-        return client;
+        return clientSer.findById(clientId);
     }
 
     public Request requestValidate(Long requestId) {
         if (requestId == null)
             throw new NullIdException("request's id cannot be null.");
-        Request request = requestSer.findById(requestId);
-        if (request == null)
-            throw new IllegalArgumentException("request's id is not valid.");
-        return request;
+        return requestSer.findById(requestId);
     }
 
     public Worker workerValidate(Long workerId) {
         if (workerId == null)
             throw new NullIdException("worker's id cannot be null.");
-        Worker worker = workerSer.findById(workerId);
-        if (worker == null)
-            throw new IllegalArgumentException("worker's id is not valid.");
-        return worker;
+        return workerSer.findById(workerId);
     }
 
     public Offer offerValidate(Long offerId) {
         if (offerId == null)
             throw new NullIdException("offer's id cannot be null.");
-        Offer offer = offerSer.findById(offerId);
-        if (offer == null)
-            throw new IllegalArgumentException("offer's id is not valid.");
-        return offer;
+        return offerSer.findById(offerId);
     }
 
     public Job jobValidate(Long jobId) {
         if (jobId == null)
             throw new NullIdException("job's id cannot be null.");
-        Job job = jobSer.findById(jobId);
-        if (job == null)
-            throw new IllegalArgumentException("job's id is not valid.");
-        return job;
+        return jobSer.findById(jobId);
     }
 }

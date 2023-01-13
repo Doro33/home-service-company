@@ -3,6 +3,8 @@ package ir.maktab.homeservicecompany.models.client.service;
 import com.google.common.base.Strings;
 import ir.maktab.homeservicecompany.models.admin.entity.Admin;
 import ir.maktab.homeservicecompany.models.admin.service.AdminService;
+import ir.maktab.homeservicecompany.models.bank_card.dto.MoneyTransferDTO;
+import ir.maktab.homeservicecompany.models.bank_card.service.BankCardService;
 import ir.maktab.homeservicecompany.models.offer.dto.ChooseOfferDTO;
 import ir.maktab.homeservicecompany.models.offer.service.OfferService;
 import ir.maktab.homeservicecompany.models.request.entity.RequestStatus;
@@ -37,13 +39,14 @@ import java.util.List;
 
 @Service
 public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements ClientService {
-    public ClientSerImpl(ClientDao repository, @Lazy RequestService requestSer, OfferService offerSer, WorkerService workerSer, @Lazy AdminService adminSer, Validation validation) {
+    public ClientSerImpl(ClientDao repository, @Lazy RequestService requestSer, OfferService offerSer, WorkerService workerSer, @Lazy AdminService adminSer, BankCardService bankCardSer, Validation validation) {
         super(repository);
 
         this.requestSer = requestSer;
         this.offerSer = offerSer;
         this.workerSer = workerSer;
         this.adminSer = adminSer;
+        this.bankCardSer = bankCardSer;
         this.validation = validation;
     }
 
@@ -52,6 +55,8 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
     private final WorkerService workerSer;
 
     private final AdminService adminSer;
+
+    private final BankCardService bankCardSer;
     private final Validation validation;
 
     @PersistenceContext
@@ -183,6 +188,17 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         predicateList.toArray(predicates);
         query.select(root).where(predicates);
         return em.createQuery(query).getResultList();
+    }
+
+    @Override
+    @Transactional
+    public Client increaseCredit(Long clientId, MoneyTransferDTO moneyTransferDTO) {
+            Client client = validation.clientValidate(clientId);
+            Double amount = moneyTransferDTO.getAmount();
+            bankCardSer.moneyTransfer(moneyTransferDTO);
+
+            client.setCredit(client.getCredit()+amount);
+            return saveOrUpdate(client);
     }
 
     private static Long extraHoursCalculator(Request request) {
