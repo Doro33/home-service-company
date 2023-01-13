@@ -12,7 +12,7 @@ import java.util.List;
 public interface OfferService extends BaseService<Offer> {
     Offer saveNewOffer(OfferDTO offerDTO);
 
-    List<Offer> findByRequestOrderByExpectedPrice(Request request);
+    List<Offer> findByRequestOrderByExpectedPrice(Long requestId);
 
     List<Offer> findByRequestOrderByWorkerScore(Long requestId);
 

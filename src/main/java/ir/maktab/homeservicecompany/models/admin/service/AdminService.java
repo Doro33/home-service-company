@@ -18,13 +18,9 @@ public interface AdminService extends BaseService<Admin> {
     Category addNewCategory(String name);
 
     Optional<Category> findCategoryByName(String name);
-    List<Category> findAllCategories();
     Job addNewJob(Job job);
 
     Job updateJob(JobDTO jobDTO);
-
-
-    List<Job> findAllJobs();
     void permitWorkerSkill(Long id);
 
     void banWorkerSkill(Long id);

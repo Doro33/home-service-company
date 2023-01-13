@@ -6,15 +6,14 @@ import jakarta.persistence.Entity;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
+@ToString
 @NotNull
 public class Client extends BaseEntity {
         public Client(String firstName, String lastName, String email, String password) {

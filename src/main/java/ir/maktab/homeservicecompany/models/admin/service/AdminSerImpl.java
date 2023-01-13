@@ -50,11 +50,6 @@ public class AdminSerImpl extends BaseServiceImpl<Admin, AdminDao> implements Ad
     }
 
     @Override
-    public List<Category> findAllCategories() {
-        return categorySer.findAll();
-    }
-
-    @Override
     public Job addNewJob(Job job) {
         return jobSer.addNewJob(job);
     }
@@ -62,11 +57,6 @@ public class AdminSerImpl extends BaseServiceImpl<Admin, AdminDao> implements Ad
     @Override
     public Job updateJob(JobDTO jobDTO) {
         return jobSer.updateJob(jobDTO);
-    }
-
-    @Override
-    public List<Job> findAllJobs() {
-        return jobSer.findAll();
     }
 
     @Override

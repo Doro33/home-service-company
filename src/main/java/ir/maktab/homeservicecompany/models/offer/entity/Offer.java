@@ -8,17 +8,16 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
+@ToString
 @NotNull
 public class Offer extends BaseEntity {
     public Offer(Worker worker, Request request, Double expectedPrice, Duration expectedDuration) {

@@ -11,17 +11,17 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.Fetch;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
+@ToString
 @NotNull
 public class Request extends BaseEntity {
     public Request(Client client, Job job, Double proposedPrice, String description,
@@ -52,6 +52,7 @@ public class Request extends BaseEntity {
     private RequestStatus status;
     @ManyToOne
     @Nullable
+    @ToString.Exclude
     private Offer acceptedOffer;
     @Nullable
     private LocalTime startAt;

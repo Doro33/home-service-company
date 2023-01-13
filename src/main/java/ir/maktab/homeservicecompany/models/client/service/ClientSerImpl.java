@@ -1,10 +1,10 @@
 package ir.maktab.homeservicecompany.models.client.service;
 
 import com.google.common.base.Strings;
+import ir.maktab.homeservicecompany.models.admin.entity.Admin;
 import ir.maktab.homeservicecompany.models.admin.service.AdminService;
 import ir.maktab.homeservicecompany.models.offer.dto.ChooseOfferDTO;
 import ir.maktab.homeservicecompany.models.offer.service.OfferService;
-import ir.maktab.homeservicecompany.models.request.dto.RequestDTO;
 import ir.maktab.homeservicecompany.models.request.entity.RequestStatus;
 import ir.maktab.homeservicecompany.models.request.service.RequestService;
 import ir.maktab.homeservicecompany.models.worker.service.WorkerService;
@@ -44,12 +44,15 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         this.requestSer = requestSer;
         this.offerSer = offerSer;
         this.workerSer = workerSer;
+        this.adminSer = adminSer;
         this.validation = validation;
     }
 
     private final RequestService requestSer;
     private final OfferService offerSer;
     private final WorkerService workerSer;
+
+    private final AdminService adminSer;
     private final Validation validation;
 
     @PersistenceContext
@@ -87,18 +90,6 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         client.setPassword(newPassword1);
         return saveOrUpdate(client);
     }
-
-
-    @Override
-    public List<Offer> findOfferByRequestOrderByPrice(Request request) {
-        return offerSer.findByRequestOrderByExpectedPrice(request);
-    }
-
-    @Override
-    public List<Offer> findOfferByRequestOrderByScore(Request request) {
-        return offerSer.findByRequestOrderByWorkerScore(request.getId());
-    }
-
     @Override
     public void setRequestStatusOnStarted(Long clientId, Long requestId) {
         Client client = clientValidation(clientId);
@@ -152,14 +143,14 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
 
     @Override
     @Transactional
-    public void payWithCredit(Client client, Request request) {
+    public void payWithCredit(Long clientId, Long requestId) {
+        Client client = clientValidation(clientId);
+        Request request = requestValidation(requestId);
         Offer acceptedOffer = request.getAcceptedOffer();
         Double clientCredit = client.getCredit();
         Double workPrice = acceptedOffer.getExpectedPrice();
         Worker worker = acceptedOffer.getWorker();
-
-        clientValidation(client.getId());
-        requestValidation(request.getId());
+        Admin admin = adminSer.findById(1L);
 
         if (request.getClient() != client)
             throw new IllegalArgumentException("request doesn't belong to this client.");
@@ -170,13 +161,15 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
             throw new CreditAmountException("client's credit is not enough.");
 
         client.setCredit(clientCredit - workPrice);
-        //todo: 30 % to admin
-        worker.setCredit(
-                worker.getCredit() + workPrice * 0.7);
-        request.setStatus(RequestStatus.PAID);
-
         saveOrUpdate(client);
+        
+        worker.setCredit(worker.getCredit() + workPrice * 0.7);
         workerSer.saveOrUpdate(worker);
+
+        admin.setCredit(admin.getCredit() + workPrice * 0.3);
+        adminSer.saveOrUpdate(admin);
+        
+        request.setStatus(RequestStatus.PAID);
         requestSer.saveOrUpdate(request);
     }
 
@@ -226,7 +219,6 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         Duration extraDuration = actualDuration.minus(expectedDuration);
         return extraDuration.toHours();
     }
-
 
     private void predicateMaker(ClientDTO clientDto, List<Predicate> predicateList,
                                 CriteriaBuilder criteriaBuilder, Root<Client> root) {

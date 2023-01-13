@@ -16,16 +16,12 @@ public interface ClientService extends BaseService<Client> {
     Client signUp(Client client);
 
     Client changePassword(String email, String oldPassword, String newPassword1, String newPassword2);
-
-    List<Offer> findOfferByRequestOrderByPrice(Request request);
-    List<Offer> findOfferByRequestOrderByScore(Request request);
-
     void setRequestStatusOnStarted(Long clientId, Long requestId);
     void setRequestStatusOnCompleted(Long clientId, Long requestId);
 
     void chooseAnOffer(ChooseOfferDTO chooseOfferDTO);
 
-    void payWithCredit(Client client, Request request);
+    void payWithCredit(Long clientId, Long requestId);
 
     List<Client> clientCriteria(ClientDTO clientDto);
 }

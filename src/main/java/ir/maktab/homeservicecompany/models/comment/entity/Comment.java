@@ -6,14 +6,13 @@ import jakarta.annotation.Nullable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
+@ToString
 @NotNull
 public class Comment extends BaseEntity {
     @OneToOne

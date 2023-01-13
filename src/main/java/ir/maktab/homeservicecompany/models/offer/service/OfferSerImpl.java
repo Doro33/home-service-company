@@ -5,7 +5,6 @@ import ir.maktab.homeservicecompany.models.request.entity.RequestStatus;
 import ir.maktab.homeservicecompany.models.request.service.RequestService;
 import ir.maktab.homeservicecompany.models.worker.service.WorkerService;
 import ir.maktab.homeservicecompany.utils.base.service.BaseServiceImpl;
-import ir.maktab.homeservicecompany.utils.exception.InvalidIdException;
 import ir.maktab.homeservicecompany.utils.exception.NullIdException;
 import ir.maktab.homeservicecompany.utils.exception.RequestStatusException;
 import ir.maktab.homeservicecompany.utils.exception.SkillsException;
@@ -49,22 +48,20 @@ public class OfferSerImpl extends BaseServiceImpl<Offer, OfferDao> implements Of
         request.setStatus(RequestStatus.AWAITING_FOR_CHOOSE_A_WORKER);
         requestSer.saveOrUpdate(request);
 
-        worker.setOfferCounter(worker.getOfferCounter()+1);
+        worker.setOfferCounter(worker.getOfferCounter() + 1);
         workerSer.saveOrUpdate(worker);
 
         return saveOrUpdate(offer);
     }
 
     private void offerValidate(OfferDTO offerDTO, Worker worker, Request request) {
-        RequestStatus status = request.getStatus();
         Job job = request.getJob();
         Double minPrice = job.getMinimumPrice();
         if (existsByWorkerAndRequest(worker, request))
             throw new IllegalArgumentException("this worker already offered for this request.");
         if (!workerSkillSer.canWorkerDoThisJob(worker, job))
             throw new SkillsException("the worker doesnt have skill for this job");
-        if (!(status == RequestStatus.AWAITING_FOR_OFFERS
-                || status == RequestStatus.AWAITING_FOR_CHOOSE_A_WORKER))
+        if (request.getAcceptedOffer()!=null)
             throw new RequestStatusException("this request has been taken.");
         if (offerDTO.getExpectedPrice() < minPrice)
             throw new IllegalArgumentException("expected price cannot be lesser than " + minPrice);
@@ -73,23 +70,24 @@ public class OfferSerImpl extends BaseServiceImpl<Offer, OfferDao> implements Of
     }
 
     @Override
-    public List<Offer> findByRequestOrderByExpectedPrice(Request request) {
-        requestValidation(request.getId());
-        return repository.findByRequestOrderByExpectedPrice(request);
+    public List<Offer> findByRequestOrderByExpectedPrice(Long requestId) {
+        Request request = requestValidation(requestId);
+        if (request.getAcceptedOffer()!=null)
+            throw new IllegalArgumentException("this request already chose an offer");
+        return repository.findByRequestOrderByExpectedPrice(requestId);
     }
 
     @Override
     public List<Offer> findByRequestOrderByWorkerScore(Long requestId) {
-        if (requestId == null)
-            throw new NullIdException("request's id cannot be null.");
-        if (requestSer.findById(requestId) == null)
-            throw new IllegalArgumentException("request's id is not valid.");
+        Request request = requestValidation(requestId);
+        if (request.getAcceptedOffer()!=null)
+            throw new IllegalArgumentException("this request already chose an offer");
         return repository.findByRequestOrderByWorkerScore(requestId);
     }
 
     @Override
     public boolean existsByWorkerAndRequest(Worker worker, Request request) {
-        return repository.existsByWorkerAndRequest(worker,request);
+        return repository.existsByWorkerAndRequest(worker, request);
     }
 
     private Worker workerValidation(Long workerId) {
