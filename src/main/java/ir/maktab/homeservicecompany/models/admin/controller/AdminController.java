@@ -6,8 +6,13 @@ import ir.maktab.homeservicecompany.models.client.entity.Client;
 import ir.maktab.homeservicecompany.models.client.service.ClientService;
 import ir.maktab.homeservicecompany.models.job.dto.JobDTO;
 import ir.maktab.homeservicecompany.models.job.entity.Job;
+import ir.maktab.homeservicecompany.models.offer.entity.Offer;
+import ir.maktab.homeservicecompany.models.offer.service.OfferService;
+import ir.maktab.homeservicecompany.models.request.entity.Request;
+import ir.maktab.homeservicecompany.models.request.service.RequestService;
 import ir.maktab.homeservicecompany.models.worker.entity.Worker;
 import ir.maktab.homeservicecompany.models.worker.service.WorkerService;
+import ir.maktab.homeservicecompany.models.worker_skill.service.WorkerSkillService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,13 +22,20 @@ import java.util.List;
 public class AdminController {
     private final AdminService adminSer;
     private final ClientService clientSer;
-
+    private final RequestService requestSer;
     private final WorkerService workerSer;
+    private final OfferService offerSer;
 
-    public AdminController(AdminService adminSer, ClientService clientSer, WorkerService workerSer) {
+    private final WorkerSkillService workerSkillSer;
+
+
+    public AdminController(AdminService adminSer, ClientService clientSer, RequestService requestSer, WorkerService workerSer, OfferService offerSer, WorkerSkillService workerSkillSer) {
         this.adminSer = adminSer;
         this.clientSer = clientSer;
+        this.requestSer = requestSer;
         this.workerSer = workerSer;
+        this.offerSer = offerSer;
+        this.workerSkillSer = workerSkillSer;
     }
 
     @PostMapping("/addCategory")
@@ -69,5 +81,20 @@ public class AdminController {
     @GetMapping("/showAllWorkers")
     public List<Worker> showAllWorkers(){
         return workerSer.findAll();
+    }
+
+    @GetMapping("/showClientRequest/{clientId}")
+    public List<Request> showClientRequests(@PathVariable Long clientId){
+        return requestSer.findByClient(clientId);
+    }
+
+    @GetMapping("/showWorkerOffers/{workerId}")
+    public List<Offer> showWorkerOffers(@PathVariable Long workerId){
+        return offerSer.findByWorker(workerId);
+    }
+
+    @GetMapping("/showJobWorkers/{jobId}")
+    public List<Worker> showJobWorkers(@PathVariable Long jobId){
+        return workerSkillSer.findWorkerByJobId(jobId);
     }
 }

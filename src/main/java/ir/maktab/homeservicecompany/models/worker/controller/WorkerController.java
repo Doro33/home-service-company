@@ -70,7 +70,7 @@ public class WorkerController {
         return workerSer.findById(workerId).getCredit();
     }
 
-    @GetMapping("/showMyOffer/{workerId}")
+    @GetMapping("/showMyOffers/{workerId}")
     public List<Offer> showWorkerOffers(@PathVariable Long workerId){
         return offerSer.findByWorker(workerId);
     }

@@ -5,20 +5,21 @@ import ir.maktab.homeservicecompany.models.worker.entity.WorkerStatus;
 import ir.maktab.homeservicecompany.models.worker_skill.dao.WorkerSkillDao;
 import ir.maktab.homeservicecompany.utils.base.service.BaseServiceImpl;
 import ir.maktab.homeservicecompany.utils.exception.AdminPermitException;
-import ir.maktab.homeservicecompany.utils.exception.InvalidIdException;
 import ir.maktab.homeservicecompany.utils.exception.NullIdException;
 import ir.maktab.homeservicecompany.models.worker.entity.Worker;
 import ir.maktab.homeservicecompany.models.worker_skill.entity.WorkerSkill;
+import ir.maktab.homeservicecompany.utils.validation.Validation;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 public class WorkerSkillSerImpl extends BaseServiceImpl<WorkerSkill,WorkerSkillDao> implements WorkerSkillService{
+    private final Validation validation;
 
-    public WorkerSkillSerImpl(WorkerSkillDao repository) {
+    public WorkerSkillSerImpl(WorkerSkillDao repository, Validation validation) {
         super(repository);
+        this.validation = validation;
     }
 
     @Override
@@ -59,5 +60,11 @@ public class WorkerSkillSerImpl extends BaseServiceImpl<WorkerSkill,WorkerSkillD
     @Override
     public boolean canWorkerDoThisJob(Worker worker, Job job) {
         return repository.existsByWorkerAndJobAndConfirmedByAdminIsTrue(worker, job);
+    }
+
+    @Override
+    public List<Worker> findWorkerByJobId(Long jobId) {
+        validation.jobValidate(jobId);
+        return repository.findWorkerByJobId(jobId);
     }
 }

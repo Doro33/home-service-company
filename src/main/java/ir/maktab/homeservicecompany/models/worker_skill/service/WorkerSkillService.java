@@ -21,4 +21,5 @@ public interface WorkerSkillService extends BaseService<WorkerSkill> {
 
     boolean canWorkerDoThisJob(Worker worker, Job job);
 
+    List<Worker> findWorkerByJobId(Long jobId);
 }

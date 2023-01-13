@@ -122,6 +122,7 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         if (extraHours > 0) {
             Worker worker = request.getAcceptedOffer().getWorker();
             worker.extraHourPenalty(extraHours);
+            worker.completedRequestEffect();
             workerSer.saveOrUpdate(worker);
         }
         requestSer.saveOrUpdate(request);

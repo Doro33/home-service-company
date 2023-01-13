@@ -87,7 +87,7 @@ public class ClientController {
         return clientSer.findById(clientId).getCredit();
     }
 
-    @GetMapping("/showMyRequest/{clientId}")
+    @GetMapping("/showMyRequests/{clientId}")
     public List<Request> showClientRequests(@PathVariable Long clientId){
         return requestSer.findByClient(clientId);
     }

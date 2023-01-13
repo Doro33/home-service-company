@@ -30,6 +30,7 @@ public class Worker extends BaseEntity {
         this.score = 0L;
         this.commentCounter = 0;
         this.offerCounter = 0;
+        this.completedTaskCounter =0;
     }
 
     private String firstName;
@@ -55,6 +56,8 @@ public class Worker extends BaseEntity {
 
     private Integer offerCounter;
 
+    private Integer completedTaskCounter;
+
     public void extraHourPenalty(Long extraHours) {
         if (extraHours > 0)
             score -= extraHours;
@@ -65,5 +68,9 @@ public class Worker extends BaseEntity {
     public void commentEffect(Long rating) {
         commentCounter++;
         score += rating;
+    }
+
+    public void completedRequestEffect(){
+        completedTaskCounter++;
     }
 }
