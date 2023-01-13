@@ -52,7 +52,6 @@ public class Request extends BaseEntity {
     private RequestStatus status;
     @ManyToOne
     @Nullable
-    @ToString.Exclude
     private Offer acceptedOffer;
     @Nullable
     private LocalTime startAt;

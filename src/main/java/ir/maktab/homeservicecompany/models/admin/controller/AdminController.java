@@ -2,8 +2,12 @@ package ir.maktab.homeservicecompany.models.admin.controller;
 
 import ir.maktab.homeservicecompany.models.admin.service.AdminService;
 import ir.maktab.homeservicecompany.models.category.entity.Category;
+import ir.maktab.homeservicecompany.models.client.entity.Client;
+import ir.maktab.homeservicecompany.models.client.service.ClientService;
 import ir.maktab.homeservicecompany.models.job.dto.JobDTO;
 import ir.maktab.homeservicecompany.models.job.entity.Job;
+import ir.maktab.homeservicecompany.models.worker.entity.Worker;
+import ir.maktab.homeservicecompany.models.worker.service.WorkerService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,12 +16,15 @@ import java.util.List;
 @RequestMapping("/admin")
 public class AdminController {
     private final AdminService adminSer;
+    private final ClientService clientSer;
 
-    public AdminController(AdminService adminSer) {
+    private final WorkerService workerSer;
+
+    public AdminController(AdminService adminSer, ClientService clientSer, WorkerService workerSer) {
         this.adminSer = adminSer;
+        this.clientSer = clientSer;
+        this.workerSer = workerSer;
     }
-
-
 
     @PostMapping("/addCategory")
     public void addCategory(@RequestBody Category category) {
@@ -54,5 +61,13 @@ public class AdminController {
         adminSer.confirmWorker(id);
     }
 
+    @GetMapping("/showAllClients")
+    public List<Client> showAllClients(){
+        return clientSer.findAll();
+    }
 
+    @GetMapping("/showAllWorkers")
+    public List<Worker> showAllWorkers(){
+        return workerSer.findAll();
+    }
 }

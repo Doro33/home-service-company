@@ -28,5 +28,7 @@ public interface OfferDao extends JpaRepository<Offer,Long> {
 """)
     List<Offer> findByRequestOrderByWorkerScore(Long requestId);
 
+    List<Offer> findByWorker(Worker worker);
+
     boolean existsByWorkerAndRequest(Worker worker, Request request);
 }

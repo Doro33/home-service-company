@@ -8,6 +8,7 @@ import ir.maktab.homeservicecompany.models.offer.dto.ChooseOfferDTO;
 import ir.maktab.homeservicecompany.models.offer.entity.Offer;
 import ir.maktab.homeservicecompany.models.offer.service.OfferService;
 import ir.maktab.homeservicecompany.models.request.dto.RequestDTO;
+import ir.maktab.homeservicecompany.models.request.entity.Request;
 import ir.maktab.homeservicecompany.models.request.service.RequestService;
 import ir.maktab.homeservicecompany.utils.dto.PasswordDTO;
 import lombok.RequiredArgsConstructor;
@@ -79,6 +80,16 @@ public class ClientController {
     @PutMapping("/increaseCredit/{clientId}")
     public void increaseCredit(@PathVariable Long clientId,@RequestBody MoneyTransferDTO moneyTransferDTO){
         clientSer.increaseCredit(clientId,moneyTransferDTO);
+    }
+
+    @GetMapping("/showCredit/{clientId}")
+    public Double showCredit(@PathVariable Long clientId){
+        return clientSer.findById(clientId).getCredit();
+    }
+
+    @GetMapping("/showMyRequest/{clientId}")
+    public List<Request> showClientRequests(@PathVariable Long clientId){
+        return requestSer.findByClient(clientId);
     }
 
 }

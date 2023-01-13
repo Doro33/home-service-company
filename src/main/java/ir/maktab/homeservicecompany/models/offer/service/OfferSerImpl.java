@@ -73,6 +73,12 @@ public class OfferSerImpl extends BaseServiceImpl<Offer, OfferDao> implements Of
     }
 
     @Override
+    public List<Offer> findByWorker(Long workerId) {
+        Worker worker = validation.workerValidate(workerId);
+        return repository.findByWorker(worker);
+    }
+
+    @Override
     public boolean existsByWorkerAndRequest(Worker worker, Request request) {
         return repository.existsByWorkerAndRequest(worker, request);
     }

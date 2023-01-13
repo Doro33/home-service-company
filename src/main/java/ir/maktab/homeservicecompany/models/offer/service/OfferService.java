@@ -16,5 +16,7 @@ public interface OfferService extends BaseService<Offer> {
 
     List<Offer> findByRequestOrderByWorkerScore(Long requestId);
 
+    List<Offer> findByWorker(Long workerId);
+
     boolean existsByWorkerAndRequest(Worker worker, Request request);
 }

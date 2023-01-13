@@ -48,6 +48,12 @@ public class RequestSerImpl extends BaseServiceImpl<Request, RequestDao> impleme
         return repository.findByJobAndAcceptedOfferIsNullOrderByDate(job);
     }
 
+    @Override
+    public List<Request> findByClient(Long clientId) {
+        Client client= validation.clientValidate(clientId);
+        return repository.findByClient(client);
+    }
+
     private static Request requestMaker(RequestDTO requestDTO, Client client, Job job) {
         if (requestDTO.getProposedPrice() <= job.getMinimumPrice())
             throw new IllegalArgumentException("propose price must be at least." + job.getMinimumPrice());

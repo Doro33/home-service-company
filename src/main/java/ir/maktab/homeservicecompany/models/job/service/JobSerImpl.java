@@ -33,7 +33,7 @@ public class JobSerImpl extends BaseServiceImpl<Job, JobDao> implements JobServi
         if (findByName(job.getName())!=null)
             throw new IllegalArgumentException("this job has already been added");
         if (job.getMinimumPrice()<=0)
-            throw new IllegalArgumentException("minimum price cannot be lesser than 0.");
+            throw new IllegalArgumentException("minimum price must be positive.");
         return saveOrUpdate(job);
     }
 

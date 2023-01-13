@@ -1,6 +1,7 @@
 package ir.maktab.homeservicecompany.models.worker.controller;
 
 import ir.maktab.homeservicecompany.models.offer.dto.OfferDTO;
+import ir.maktab.homeservicecompany.models.offer.entity.Offer;
 import ir.maktab.homeservicecompany.models.offer.service.OfferService;
 import ir.maktab.homeservicecompany.models.worker.dto.WorkerDto;
 import ir.maktab.homeservicecompany.models.worker.entity.Worker;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/worker")
@@ -63,5 +65,13 @@ public class WorkerController {
         return workerSer.findById(workerId).getScore();
     }
 
+    @GetMapping("/showCredit/{workerId}")
+    public Double showCredit(@PathVariable Long workerId){
+        return workerSer.findById(workerId).getCredit();
+    }
 
+    @GetMapping("/showMyOffer/{workerId}")
+    public List<Offer> showWorkerOffers(@PathVariable Long workerId){
+        return offerSer.findByWorker(workerId);
+    }
 }
