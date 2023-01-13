@@ -5,10 +5,10 @@ import ir.maktab.homeservicecompany.models.job.entity.Job;
 import ir.maktab.homeservicecompany.models.request.dto.RequestDTO;
 import ir.maktab.homeservicecompany.utils.base.service.BaseServiceImpl;
 import ir.maktab.homeservicecompany.models.client.service.ClientService;
-import ir.maktab.homeservicecompany.utils.exception.NullIdException;
 import ir.maktab.homeservicecompany.models.job.service.JobService;
 import ir.maktab.homeservicecompany.models.request.dao.RequestDao;
 import ir.maktab.homeservicecompany.models.request.entity.Request;
+import ir.maktab.homeservicecompany.utils.validation.Validation;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -17,20 +17,22 @@ import java.util.List;
 
 @Service
 public class RequestSerImpl extends BaseServiceImpl<Request, RequestDao> implements RequestService {
-    public RequestSerImpl(RequestDao repository, ClientService clientSer, JobService jobSer) {
+    public RequestSerImpl(RequestDao repository, ClientService clientSer, JobService jobSer, Validation validation) {
         super(repository);
         this.clientSer = clientSer;
         this.jobSer = jobSer;
+        this.validation = validation;
     }
 
     private final ClientService clientSer;
     private final JobService jobSer;
+    private final Validation validation;
 
 
     @Override
     public Request saveNewRequest(RequestDTO requestDTO) {
-        Client client = clientValidation(requestDTO.getClientId());
-        Job job = jobValidation(requestDTO.getJobId());
+        Client client = validation.clientValidate(requestDTO.getClientId());
+        Job job = validation.jobValidate(requestDTO.getJobId());
         Request request = requestMaker(requestDTO, client, job);
 
         client.setRequestCounter(
@@ -61,19 +63,5 @@ public class RequestSerImpl extends BaseServiceImpl<Request, RequestDao> impleme
                 requestDTO.getDate(),
                 requestDTO.getSuggestedTime(),
                 requestDTO.getAddress());
-    }
-
-    private Job jobValidation(Long jobId) {
-        if (jobId == null) throw new NullIdException("job's id cannot be null.");
-        Job job = jobSer.findById(jobId);
-        if (job == null) throw new IllegalArgumentException("job's id is not valid.");
-        return job;
-    }
-
-    private Client clientValidation(Long clientId) {
-        if (clientId == null) throw new NullIdException("client's id cannot be null.");
-        Client client = clientSer.findById(clientId);
-        if (client == null) throw new IllegalArgumentException("client's id is not valid.");
-        return client;
     }
 }

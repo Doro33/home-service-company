@@ -1,6 +1,8 @@
 package ir.maktab.homeservicecompany.models.client.controller;
 
 import ir.maktab.homeservicecompany.models.client.service.ClientService;
+import ir.maktab.homeservicecompany.models.comment.dto.CommentDTO;
+import ir.maktab.homeservicecompany.models.comment.service.CommentService;
 import ir.maktab.homeservicecompany.models.offer.dto.ChooseOfferDTO;
 import ir.maktab.homeservicecompany.models.offer.entity.Offer;
 import ir.maktab.homeservicecompany.models.offer.service.OfferService;
@@ -18,8 +20,9 @@ import java.util.List;
 public class ClientController {
     private final ClientService clientSer;
     private final RequestService requestSer;
-
     private final OfferService offerSer;
+
+    private final CommentService commentSer;
 
     @PutMapping("/changePassword")
     public void changePassword(@RequestBody PasswordDTO passwordDTO) {
@@ -65,6 +68,11 @@ public class ClientController {
     @PutMapping("/payWithCredit/{clientId}/{requestId}")
     public void payWithCredit(@PathVariable Long clientId,@PathVariable Long requestId){
         clientSer.payWithCredit(clientId,requestId);
+    }
+
+    @PostMapping("/addComment")
+    public void addComment(@RequestBody CommentDTO commentDTO){
+        commentSer.addComment(commentDTO);
     }
 
 }

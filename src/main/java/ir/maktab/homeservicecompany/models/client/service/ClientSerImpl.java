@@ -14,7 +14,6 @@ import ir.maktab.homeservicecompany.models.client.dto.ClientDTO;
 import ir.maktab.homeservicecompany.models.client.entity.Client;
 import ir.maktab.homeservicecompany.utils.exception.CreditAmountException;
 import ir.maktab.homeservicecompany.utils.exception.InvalidIdException;
-import ir.maktab.homeservicecompany.utils.exception.NullIdException;
 import ir.maktab.homeservicecompany.utils.exception.RequestStatusException;
 import ir.maktab.homeservicecompany.models.offer.entity.Offer;
 import ir.maktab.homeservicecompany.models.request.entity.Request;
@@ -92,8 +91,8 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
     }
     @Override
     public void setRequestStatusOnStarted(Long clientId, Long requestId) {
-        Client client = clientValidation(clientId);
-        Request request = requestValidation(requestId);
+        Client client = validation.clientValidate(clientId);
+        Request request = validation.requestValidate(requestId);
         if (request.getClient()!=client)
             throw new IllegalArgumentException("request doesn't belong to this client.");
         if (request.getStatus() != RequestStatus.WORKER_ON_THE_ROAD)
@@ -106,8 +105,8 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
     @Override
     @Transactional
     public void setRequestStatusOnCompleted(Long clientId, Long requestId) {
-        Client client = clientValidation(clientId);
-        Request request = requestValidation(requestId);
+        Client client = validation.clientValidate(clientId);
+        Request request = validation.requestValidate(requestId);
         if (request.getClient()!=client)
             throw new IllegalArgumentException("request doesn't belong to this client.");
         if (request.getStatus() != RequestStatus.STARTED)
@@ -125,9 +124,9 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
     @Override
     @Transactional
     public void chooseAnOffer(ChooseOfferDTO chooseOfferDTO) {
-        Client client = clientValidation(chooseOfferDTO.getClientId());
-        Request request = requestValidation(chooseOfferDTO.getRequestId());
-        Offer offer = offerValidation(chooseOfferDTO.getOfferId());
+        Client client = validation.clientValidate(chooseOfferDTO.getClientId());
+        Request request = validation.requestValidate(chooseOfferDTO.getRequestId());
+        Offer offer = validation.offerValidate(chooseOfferDTO.getOfferId());
         if (request.getClient() != client)
             throw new IllegalArgumentException("request doesn't belong to this client.");
         if (offer.getRequest() != request)
@@ -144,8 +143,8 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
     @Override
     @Transactional
     public void payWithCredit(Long clientId, Long requestId) {
-        Client client = clientValidation(clientId);
-        Request request = requestValidation(requestId);
+        Client client = validation.clientValidate(clientId);
+        Request request = validation.requestValidate(requestId);
         Offer acceptedOffer = request.getAcceptedOffer();
         Double clientCredit = client.getCredit();
         Double workPrice = acceptedOffer.getExpectedPrice();
@@ -184,33 +183,6 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         predicateList.toArray(predicates);
         query.select(root).where(predicates);
         return em.createQuery(query).getResultList();
-    }
-
-    private Client clientValidation(Long clientId) {
-        if (clientId == null)
-            throw new NullIdException("client's id cannot be null.");
-        Client client = findById(clientId);
-        if (client == null)
-            throw new IllegalArgumentException("client's id is not valid.");
-        return client;
-    }
-
-    private Request requestValidation(Long requestId) {
-        if (requestId == null)
-            throw new NullIdException("request's id cannot be null.");
-        Request request = requestSer.findById(requestId);
-        if (request == null)
-            throw new IllegalArgumentException("request's id is not valid.");
-        return request;
-    }
-
-    private Offer offerValidation(Long offerId) {
-        if (offerId == null)
-            throw new NullIdException("offer's id cannot be null.");
-        Offer offer = offerSer.findById(offerId);
-        if (offer == null)
-            throw new IllegalArgumentException("offer's id is not valid.");
-        return offer;
     }
 
     private static Long extraHoursCalculator(Request request) {

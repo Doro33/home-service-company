@@ -1,16 +1,18 @@
 package ir.maktab.homeservicecompany.models.comment.service;
 
+import ir.maktab.homeservicecompany.models.client.entity.Client;
+import ir.maktab.homeservicecompany.models.comment.dto.CommentDTO;
+import ir.maktab.homeservicecompany.models.request.service.RequestService;
 import ir.maktab.homeservicecompany.models.worker.service.WorkerService;
 import ir.maktab.homeservicecompany.utils.base.service.BaseServiceImpl;
-import ir.maktab.homeservicecompany.models.client.entity.Client;
 import ir.maktab.homeservicecompany.models.client.service.ClientService;
 import ir.maktab.homeservicecompany.models.comment.dao.CommentDao;
 import ir.maktab.homeservicecompany.models.comment.entity.Comment;
-import ir.maktab.homeservicecompany.utils.exception.NullIdException;
 import ir.maktab.homeservicecompany.utils.exception.RequestStatusException;
 import ir.maktab.homeservicecompany.models.request.entity.Request;
 import ir.maktab.homeservicecompany.models.request.entity.RequestStatus;
 import ir.maktab.homeservicecompany.models.worker.entity.Worker;
+import ir.maktab.homeservicecompany.utils.validation.Validation;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,37 +20,42 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentSerImpl extends BaseServiceImpl<Comment, CommentDao> implements CommentService {
     private final ClientService clientSer;
     private final WorkerService workerSer;
+    private final RequestService requestSer;
+    private final Validation validation;
 
-    public CommentSerImpl(CommentDao repository, ClientService clientSer, WorkerService workerSer) {
+    public CommentSerImpl(CommentDao repository, ClientService clientSer, WorkerService workerSer, RequestService requestSer, Validation validation) {
         super(repository);
         this.clientSer = clientSer;
         this.workerSer = workerSer;
+        this.requestSer = requestSer;
+        this.validation = validation;
     }
 
     @Override
     @Transactional
-    public Comment addComment(Client client, Comment comment) {
-        Request request = comment.getRequest();
+    public Comment addComment(CommentDTO commentDTO) {
+        Client client = validation.clientValidate(commentDTO.getClientId());
+        Request request = validation.requestValidate(commentDTO.getRequestId());
         RequestStatus status = request.getStatus();
         Worker worker = request.getAcceptedOffer().getWorker();
-
-        clientValidation(client.getId());
-
         if (request.getClient() != client)
             throw new IllegalArgumentException("request doesn't belong to this client.");
+        if (existsByRequest(request))
+            throw new IllegalArgumentException("this request has been already commented.");
         if (!(status == RequestStatus.COMPLETED || status == RequestStatus.PAID))
             throw new RequestStatusException("this request must be completed first.");
 
-       worker.commentEffect(comment.getRating());
-
+       worker.commentEffect(commentDTO.getRating());
         workerSer.saveOrUpdate(worker);
+
+        Comment comment = new Comment(request, commentDTO.getRating(), commentDTO.getDescription());
         return saveOrUpdate(comment);
     }
 
-    private void clientValidation(Long clientId) {
-        if (clientId == null)
-            throw new NullIdException("client's id cannot be null.");
-        if (clientSer.findById(clientId) == null)
-            throw new IllegalArgumentException("client's id is not valid.");
+    @Override
+    public Boolean existsByRequest(Request request) {
+        return repository.existsByRequest(request);
     }
+
+
 }

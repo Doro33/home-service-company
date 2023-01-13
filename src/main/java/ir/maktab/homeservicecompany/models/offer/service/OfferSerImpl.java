@@ -5,7 +5,6 @@ import ir.maktab.homeservicecompany.models.request.entity.RequestStatus;
 import ir.maktab.homeservicecompany.models.request.service.RequestService;
 import ir.maktab.homeservicecompany.models.worker.service.WorkerService;
 import ir.maktab.homeservicecompany.utils.base.service.BaseServiceImpl;
-import ir.maktab.homeservicecompany.utils.exception.NullIdException;
 import ir.maktab.homeservicecompany.utils.exception.RequestStatusException;
 import ir.maktab.homeservicecompany.utils.exception.SkillsException;
 import ir.maktab.homeservicecompany.models.job.entity.Job;
@@ -14,6 +13,7 @@ import ir.maktab.homeservicecompany.models.offer.entity.Offer;
 import ir.maktab.homeservicecompany.models.request.entity.Request;
 import ir.maktab.homeservicecompany.models.worker.entity.Worker;
 import ir.maktab.homeservicecompany.models.worker_skill.service.WorkerSkillService;
+import ir.maktab.homeservicecompany.utils.validation.Validation;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,23 +23,25 @@ import java.util.List;
 
 @Service
 public class OfferSerImpl extends BaseServiceImpl<Offer, OfferDao> implements OfferService {
-    public OfferSerImpl(OfferDao repository, WorkerService workerSer, @Lazy RequestService requestSer, WorkerSkillService workerSkillSer) {
+    public OfferSerImpl(OfferDao repository, WorkerService workerSer, @Lazy RequestService requestSer, WorkerSkillService workerSkillSer, Validation validation) {
         super(repository);
         this.workerSer = workerSer;
         this.requestSer = requestSer;
         this.workerSkillSer = workerSkillSer;
+        this.validation = validation;
     }
 
     private final WorkerService workerSer;
     private final RequestService requestSer;
     private final WorkerSkillService workerSkillSer;
+    private final Validation validation;
 
     @Override
     @Transactional
     public Offer saveNewOffer(OfferDTO offerDTO) {
-        Worker worker = workerValidation(offerDTO.getWorkerId());
-        Request request = requestValidation(offerDTO.getRequestId());
-        offerValidate(offerDTO, worker, request);
+        Worker worker = validation.workerValidate(offerDTO.getWorkerId());
+        Request request = validation.requestValidate(offerDTO.getRequestId());
+        offerCustomValidate(offerDTO, worker, request);
 
         Offer offer = new Offer(worker, request,
                 offerDTO.getExpectedPrice(),
@@ -54,7 +56,27 @@ public class OfferSerImpl extends BaseServiceImpl<Offer, OfferDao> implements Of
         return saveOrUpdate(offer);
     }
 
-    private void offerValidate(OfferDTO offerDTO, Worker worker, Request request) {
+    @Override
+    public List<Offer> findByRequestOrderByExpectedPrice(Long requestId) {
+        Request request = validation.requestValidate(requestId);
+        if (request.getAcceptedOffer()!=null)
+            throw new IllegalArgumentException("this request already chose an offer");
+        return repository.findByRequestOrderByExpectedPrice(requestId);
+    }
+
+    @Override
+    public List<Offer> findByRequestOrderByWorkerScore(Long requestId) {
+        Request request = validation.requestValidate(requestId);
+        if (request.getAcceptedOffer()!=null)
+            throw new IllegalArgumentException("this request already chose an offer");
+        return repository.findByRequestOrderByWorkerScore(requestId);
+    }
+
+    @Override
+    public boolean existsByWorkerAndRequest(Worker worker, Request request) {
+        return repository.existsByWorkerAndRequest(worker, request);
+    }
+    private void offerCustomValidate(OfferDTO offerDTO, Worker worker, Request request) {
         Job job = request.getJob();
         Double minPrice = job.getMinimumPrice();
         if (existsByWorkerAndRequest(worker, request))
@@ -67,44 +89,5 @@ public class OfferSerImpl extends BaseServiceImpl<Offer, OfferDao> implements Of
             throw new IllegalArgumentException("expected price cannot be lesser than " + minPrice);
         if (offerDTO.getExpectedDurationByHour() < 1)
             throw new IllegalArgumentException("duration must be at least 1 hour.");
-    }
-
-    @Override
-    public List<Offer> findByRequestOrderByExpectedPrice(Long requestId) {
-        Request request = requestValidation(requestId);
-        if (request.getAcceptedOffer()!=null)
-            throw new IllegalArgumentException("this request already chose an offer");
-        return repository.findByRequestOrderByExpectedPrice(requestId);
-    }
-
-    @Override
-    public List<Offer> findByRequestOrderByWorkerScore(Long requestId) {
-        Request request = requestValidation(requestId);
-        if (request.getAcceptedOffer()!=null)
-            throw new IllegalArgumentException("this request already chose an offer");
-        return repository.findByRequestOrderByWorkerScore(requestId);
-    }
-
-    @Override
-    public boolean existsByWorkerAndRequest(Worker worker, Request request) {
-        return repository.existsByWorkerAndRequest(worker, request);
-    }
-
-    private Worker workerValidation(Long workerId) {
-        if (workerId == null)
-            throw new NullIdException("worker's id cannot be null.");
-        Worker worker = workerSer.findById(workerId);
-        if (worker == null)
-            throw new IllegalArgumentException("worker's id is not valid.");
-        return worker;
-    }
-
-    private Request requestValidation(Long requestId) {
-        if (requestId == null)
-            throw new NullIdException("request's id cannot be null.");
-        Request request = requestSer.findById(requestId);
-        if (request == null)
-            throw new IllegalArgumentException("request's id is not valid.");
-        return request;
     }
 }

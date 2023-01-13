@@ -54,8 +54,14 @@ public class WorkerController {
     }
 
     @PostMapping("/addOffer")
-    @ResponseBody
     public void addOffer(@RequestBody OfferDTO offerDTO){
         offerSer.saveNewOffer(offerDTO);
     }
+
+    @GetMapping("/showScore/{workerId}")
+    private Long showWorkerScore(@PathVariable Long workerId){
+        return workerSer.findById(workerId).getScore();
+    }
+
+
 }
