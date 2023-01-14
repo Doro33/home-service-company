@@ -14,6 +14,7 @@ import ir.maktab.homeservicecompany.utils.base.service.BaseServiceImpl;
 import ir.maktab.homeservicecompany.models.client.dao.ClientDao;
 import ir.maktab.homeservicecompany.models.client.dto.FilterClientDTO;
 import ir.maktab.homeservicecompany.models.client.entity.Client;
+import ir.maktab.homeservicecompany.utils.dto.PasswordDTO;
 import ir.maktab.homeservicecompany.utils.dto.UserDTO;
 import ir.maktab.homeservicecompany.utils.exception.CreditAmountException;
 import ir.maktab.homeservicecompany.utils.exception.RequestStatusException;
@@ -35,26 +36,28 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
 public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements ClientService {
-    public ClientSerImpl(ClientDao repository, @Lazy RequestService requestSer, OfferService offerSer, WorkerService workerSer, @Lazy AdminService adminSer, BankCardService bankCardSer, Validation validation) {
+    public ClientSerImpl(ClientDao repository, @Lazy AdminService adminSer, WorkerService workerSer,
+                         @Lazy RequestService requestSer, OfferService offerSer, BankCardService bankCardSer,
+                         Validation validation) {
         super(repository);
-
+        this.adminSer = adminSer;
+        this.workerSer = workerSer;
         this.requestSer = requestSer;
         this.offerSer = offerSer;
-        this.workerSer = workerSer;
-        this.adminSer = adminSer;
         this.bankCardSer = bankCardSer;
         this.validation = validation;
     }
 
-    private final RequestService requestSer;
-    private final OfferService offerSer;
+    private final AdminService adminSer;
     private final WorkerService workerSer;
 
-    private final AdminService adminSer;
+    private final RequestService requestSer;
+    private final OfferService offerSer;
 
     private final BankCardService bankCardSer;
     private final Validation validation;
@@ -63,8 +66,8 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
     private EntityManager em;
 
     @Override
-    public Client findByEmail(String email) {
-        return repository.findByEmail(email).orElse(null);
+    public Optional<Client> findByEmail(String email) {
+        return repository.findByEmail(email);
     }
 
     @Override
@@ -75,25 +78,25 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         String password = userDTO.getPassword();
 
         validation.nameValidate(firstName, lastName);
-        if (findByEmail(email) != null)
-            throw new IllegalArgumentException("this email has been used.");
         validation.passwordValidate(password);
+
+        if (findByEmail(email).isPresent())
+            throw new IllegalArgumentException("this email has been used.");
+
         Client client = new Client(firstName, lastName, email, password);
         saveOrUpdate(client);
     }
 
     @Override
-    public void changePassword(String email, String oldPassword, String newPassword1, String newPassword2) {
-        Client client = findByEmail(email);
-        if (client == null)
-            throw new IllegalArgumentException("this email does not have an account.");
-        if (!oldPassword.equals(client.getPassword()))
-            throw new IllegalArgumentException("incorrect password");
-        if (!newPassword2.matches(newPassword1))
-            throw new IllegalArgumentException("new passwords are not match.");
-        validation.passwordValidate(newPassword1);
+    public void changePassword(PasswordDTO passwordDTO) {
+        Client client = findByEmail(passwordDTO.getEmail()).
+                orElseThrow(() -> new IllegalArgumentException("this email does not have an account."));
+        String newPassword = validation.checkPasswords(passwordDTO, client.getPassword());
 
-        client.setPassword(newPassword1);
+        client.setPassword(newPassword);
+        saveOrUpdate(client);
+
+        client.setPassword(newPassword);
         saveOrUpdate(client);
     }
 
@@ -109,16 +112,12 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         requestSer.saveOrUpdate(request);
     }
 
-    private static void checkRequestOwner(Client client, Request request) {
-        if (request.getClient() != client)
-            throw new IllegalArgumentException("request doesn't belong to this client.");
-    }
-
     @Override
     @Transactional
     public void setRequestStatusOnCompleted(Long clientId, Long requestId) {
         Client client = validation.clientValidate(clientId);
         Request request = validation.requestValidate(requestId);
+        Worker worker = request.getAcceptedOffer().getWorker();
         checkRequestOwner(client, request);
         if (request.getStatus() != RequestStatus.STARTED)
             throw new RequestStatusException("incorrect request's status for this function.");
@@ -126,11 +125,10 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         request.setEndAt(LocalTime.now());
         Long extraHours = extraHoursCalculator(request);
         if (extraHours > 0) {
-            Worker worker = request.getAcceptedOffer().getWorker();
             worker.extraHourPenalty(extraHours);
-            worker.completedRequestEffect();
-            workerSer.saveOrUpdate(worker);
         }
+        worker.completedRequestEffect();
+        workerSer.saveOrUpdate(worker);
         requestSer.saveOrUpdate(request);
     }
 
@@ -206,7 +204,10 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         client.setCredit(client.getCredit() + amount);
         saveOrUpdate(client);
     }
-
+    private static void checkRequestOwner(Client client, Request request) {
+        if (request.getClient() != client)
+            throw new IllegalArgumentException("request doesn't belong to this client.");
+    }
     private static Long extraHoursCalculator(Request request) {
         Duration actualDuration = Duration.between(request.getStartAt(), request.getEndAt());
         Duration expectedDuration = request.getAcceptedOffer().getExpectedDuration();
@@ -238,16 +239,16 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
     private static void requestNumberPredicateMaker(FilterClientDTO filterClientDto, List<Predicate> predicateList, CriteriaBuilder criteriaBuilder, Root<Client> root) {
         Integer minRequestNumber = filterClientDto.getMinRequestNumber();
         Integer maxRequestNumber = filterClientDto.getMaxRequestNumber();
-        if (minRequestNumber ==null)
-            minRequestNumber=0;
-        if (maxRequestNumber==null)
-            maxRequestNumber=Integer.MAX_VALUE;
+        if (minRequestNumber == null)
+            minRequestNumber = 0;
+        if (maxRequestNumber == null)
+            maxRequestNumber = Integer.MAX_VALUE;
         if (maxRequestNumber < minRequestNumber)
             throw new IllegalArgumentException("max requestNumber cannot be lesser than min requestNumber");
-        if (minRequestNumber<0)
+        if (minRequestNumber < 0)
             throw new IllegalArgumentException("min requestNumber cannot be lesser than 0.");
         predicateList.add(criteriaBuilder.
-                    between(root.get("requestCounter"), minRequestNumber, maxRequestNumber));
+                between(root.get("requestCounter"), minRequestNumber, maxRequestNumber));
     }
 
     private String sampleMaker(String input) {

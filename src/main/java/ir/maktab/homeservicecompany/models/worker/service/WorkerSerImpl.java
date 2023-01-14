@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -43,29 +44,21 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
     private final Validation validation;
 
     @Override
-    public Worker findByEmail(String email) {
-        return repository.findByEmail(email).orElse(null);
+    public Optional<Worker> findByEmail(String email) {
+        return repository.findByEmail(email);
     }
 
     @Override
     public void changePassword(PasswordDTO passwordDTO) {
-        String email= passwordDTO.getEmail();
-        String oldPassword = passwordDTO.getOldPassword();
-        String newPassword1 = passwordDTO.getNewPassword1();
-        String newPassword2 = passwordDTO.getNewPassword2();
-        Worker worker = findByEmail(email);
+        Worker worker = findByEmail(passwordDTO.getEmail())
+                .orElseThrow(()->new IllegalArgumentException("this email does not have an account."));
 
-        if (worker == null)
-            throw new IllegalArgumentException("this email does not have an account.");
-        if (!oldPassword.equals(worker.getPassword()))
-            throw new IllegalArgumentException("incorrect password");
-        if (!newPassword2.matches(newPassword1))
-            throw new IllegalArgumentException("new passwords are not match.");
-        validation.passwordValidate(newPassword1);
+        String newPassword = validation.checkPasswords(passwordDTO, worker.getPassword());
 
-        worker.setPassword(newPassword1);
+        worker.setPassword(newPassword);
         saveOrUpdate(worker);
     }
+
 
     @Override
     public void signUp(UserDTO userDTO, byte[] image) {
@@ -74,7 +67,7 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
         String email = userDTO.getEmail();
         String password = userDTO.getPassword();
         validation.nameValidate(firstName, lastName);
-        if (findByEmail(email) != null)
+        if (findByEmail(email).isPresent())
             throw new IllegalArgumentException("this email has been used.");
         Worker worker = new Worker(firstName,lastName,email,password , image);
         saveOrUpdate(worker);
@@ -123,6 +116,8 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
         WorkerSkill workerSkill= new WorkerSkill(worker,job);
         workerSkillSer.saveOrUpdate(workerSkill);
     }
+
+
 
     private void createPredicates(FilterWorkerDTO filterWorkerDTO, List<Predicate> predicateList, CriteriaBuilder criteriaBuilder, Root<Worker> root) {
 

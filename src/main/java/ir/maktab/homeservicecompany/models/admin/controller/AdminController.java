@@ -24,15 +24,13 @@ import java.util.List;
 @RequestMapping("/admin")
 @AllArgsConstructor
 public class AdminController {
-    private final ClientService clientSer;
-    private final RequestService requestSer;
-    private final WorkerService workerSer;
-    private final OfferService offerSer;
-    private final JobService jobSer;
-
     private final CategoryService categorySer;
+    private final JobService jobSer;
+    private final ClientService clientSer;
+    private final WorkerService workerSer;
     private final WorkerSkillService workerSkillSer;
-
+    private final RequestService requestSer;
+    private final OfferService offerSer;
 
     @PostMapping("/addCategory")
     public void addCategory(@RequestBody Category category) {
@@ -49,6 +47,11 @@ public class AdminController {
         jobSer.updateJob(jobDTO);
     }
 
+    @PutMapping("/confirmWorker/{id}")
+    public void confirmWorker(@PathVariable Long id) {
+        workerSer.confirmWorker(id);
+    }
+
     @PutMapping("/permitWorkerSkill/{id}")
     public void permitWorkerSkill(@PathVariable Long id) {
         workerSkillSer.permitWorkerSkill(id);
@@ -57,11 +60,6 @@ public class AdminController {
     @PutMapping("/banWorkerSkill/{id}")
     public void banWorkerSkill(@PathVariable Long id) {
         workerSkillSer.banWorkerSkill(id);
-    }
-
-    @PutMapping("/confirmWorker/{id}")
-    public void confirmWorker(@PathVariable Long id) {
-        workerSer.confirmWorker(id);
     }
 
     @GetMapping("/showAllClients")

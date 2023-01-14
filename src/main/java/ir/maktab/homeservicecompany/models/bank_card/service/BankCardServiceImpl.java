@@ -4,6 +4,7 @@ import ir.maktab.homeservicecompany.models.bank_card.dao.BankCardDao;
 import ir.maktab.homeservicecompany.models.bank_card.dto.MoneyTransferDTO;
 import ir.maktab.homeservicecompany.models.bank_card.entity.BankCard;
 import ir.maktab.homeservicecompany.utils.base.service.BaseServiceImpl;
+import ir.maktab.homeservicecompany.utils.exception.BankCardInfoException;
 import ir.maktab.homeservicecompany.utils.exception.CreditAmountException;
 import org.springframework.stereotype.Service;
 
@@ -23,22 +24,29 @@ public class BankCardServiceImpl extends BaseServiceImpl<BankCard, BankCardDao> 
     public void moneyTransfer(MoneyTransferDTO cardDTO) {
         BankCard card = findByCardNumber(cardDTO.getCardNumber());
         Double amount = cardDTO.getAmount();
-        if (amount==null)
-            throw new IllegalArgumentException("money transfer amount cannot be null.");
-        if (amount<=0)
-            throw new IllegalArgumentException("money transfer amount must be positive.");
-        if (!cardDTO.getPassword().matches(card.getPassword()) )
-            throw new IllegalArgumentException("incorrect password.");
-        if (cardDTO.getCvv2()!= card.getCvv2())
-            throw new IllegalArgumentException("incorrect cvv2");
-        if (cardDTO.getExpYear()!=card.getExpYear())
-            throw new IllegalArgumentException("incorrect exp year.");
-        if (cardDTO.getExpMonth()!= card.getExpMonth())
-            throw new IllegalArgumentException("incorrect exp month.");
-        if (card.getCredit()<amount)
+        double cardCredit = card.getCredit();
+        checkAmount(amount);
+        checkBankCardInfo(cardDTO, card);
+
+        if (cardCredit<amount)
             throw new CreditAmountException("bank card's credit is not enough.");
 
-        card.setCredit(card.getCredit()-amount);
+        card.setCredit(cardCredit-amount);
         saveOrUpdate(card);
+    }
+
+    private static void checkBankCardInfo(MoneyTransferDTO cardDTO, BankCard card) {
+        if (!(cardDTO.getPassword().matches(card.getPassword()) &&
+                cardDTO.getCvv2()== card.getCvv2() &&
+                cardDTO.getExpYear()== card.getExpYear() &&
+                cardDTO.getExpMonth()== card.getExpMonth()))
+            throw new BankCardInfoException("incorrect bank cad info");
+    }
+
+    private static void checkAmount(Double amount) {
+        if (amount ==null)
+            throw new IllegalArgumentException("money transfer amount cannot be null.");
+        if (amount <=0)
+            throw new IllegalArgumentException("money transfer amount must be positive.");
     }
 }

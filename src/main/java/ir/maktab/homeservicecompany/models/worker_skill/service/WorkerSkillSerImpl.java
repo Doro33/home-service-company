@@ -28,7 +28,7 @@ public class WorkerSkillSerImpl extends BaseServiceImpl<WorkerSkill,WorkerSkillD
             throw new NullIdException("workerSkill id cannot be null.");
         WorkerSkill workerSkill = findById(id);
         if (workerSkill.getWorker().getStatus()!= WorkerStatus.CONFIRMED)
-            throw new AdminPermitException("worker is not confirmed.");
+            throw new AdminPermitException("worker must be confirmed first.");
         workerSkill.setConfirmedByAdmin(true);
         saveOrUpdate(workerSkill);
     }

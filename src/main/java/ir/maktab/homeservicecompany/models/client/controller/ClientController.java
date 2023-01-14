@@ -28,11 +28,7 @@ public class ClientController {
 
     @PutMapping("/changePassword")
     public void changePassword(@RequestBody PasswordDTO passwordDTO) {
-        clientSer.changePassword(
-                passwordDTO.getEmail(),
-                passwordDTO.getOldPassword(),
-                passwordDTO.getNewPassword1(),
-                passwordDTO.getNewPassword2());
+        clientSer.changePassword(passwordDTO);
     }
 
     @PostMapping("/addRequest")

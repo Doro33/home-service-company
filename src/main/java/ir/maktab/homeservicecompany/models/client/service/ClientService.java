@@ -5,16 +5,18 @@ import ir.maktab.homeservicecompany.models.offer.dto.ChooseOfferDTO;
 import ir.maktab.homeservicecompany.utils.base.service.BaseService;
 import ir.maktab.homeservicecompany.models.client.dto.FilterClientDTO;
 import ir.maktab.homeservicecompany.models.client.entity.Client;
+import ir.maktab.homeservicecompany.utils.dto.PasswordDTO;
 import ir.maktab.homeservicecompany.utils.dto.UserDTO;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ClientService extends BaseService<Client> {
-    Client findByEmail(String email);
+    Optional<Client> findByEmail(String email);
 
     void signUp(UserDTO userDTO);
 
-    void changePassword(String email, String oldPassword, String newPassword1, String newPassword2);
+    void changePassword(PasswordDTO passwordDTO);
     void setRequestStatusOnStarted(Long clientId, Long requestId);
     void setRequestStatusOnCompleted(Long clientId, Long requestId);
 

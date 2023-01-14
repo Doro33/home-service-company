@@ -7,10 +7,11 @@ import ir.maktab.homeservicecompany.models.worker.entity.Worker;
 import ir.maktab.homeservicecompany.utils.dto.PasswordDTO;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface WorkerService extends BaseService<Worker> {
 
-    Worker findByEmail(String email);
+    Optional<Worker> findByEmail(String email);
 
     void changePassword(PasswordDTO passwordDTO);
 

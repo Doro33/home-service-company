@@ -11,6 +11,7 @@ import ir.maktab.homeservicecompany.models.request.entity.Request;
 import ir.maktab.homeservicecompany.models.request.service.RequestService;
 import ir.maktab.homeservicecompany.models.worker.entity.Worker;
 import ir.maktab.homeservicecompany.models.worker.service.WorkerService;
+import ir.maktab.homeservicecompany.utils.dto.PasswordDTO;
 import ir.maktab.homeservicecompany.utils.exception.NullIdException;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -89,5 +90,17 @@ public class Validation {
         if (jobId == null)
             throw new NullIdException("job's id cannot be null.");
         return jobSer.findById(jobId);
+    }
+
+    public String checkPasswords(PasswordDTO passwordDTO, String truePassword) {
+        String oldPassword = passwordDTO.getOldPassword();
+        String newPassword1 = passwordDTO.getNewPassword1();
+        String newPassword2 = passwordDTO.getNewPassword2();
+        if (!oldPassword.equals(truePassword))
+            throw new IllegalArgumentException("incorrect password");
+        if (!newPassword2.matches(newPassword1))
+            throw new IllegalArgumentException("new passwords are not match.");
+        passwordValidate(newPassword1);
+        return newPassword1;
     }
 }
