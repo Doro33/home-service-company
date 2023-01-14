@@ -23,7 +23,7 @@ public class BankCard extends BaseEntity {
 
     public void setCardNumber(String cardNumber) {
         if (!cardNumber.matches("^\\d{16}$") || cardNumber.matches("^\\d{12}$"))
-            throw new RuntimeException("This card number is not valid.");
+            throw new IllegalArgumentException("This card number is not valid.");
         this.cardNumber = cardNumber;
     }
 

@@ -7,5 +7,8 @@ import java.util.Random;
 @Service
 public class AppContext {
     @Getter
-    private final static Random RANDOM = new Random();
+    private static final  Random RANDOM = new Random();
+
+    private AppContext() {
+    }
 }

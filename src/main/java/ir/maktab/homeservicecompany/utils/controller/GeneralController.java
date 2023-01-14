@@ -9,6 +9,7 @@ import ir.maktab.homeservicecompany.models.request.entity.Request;
 import ir.maktab.homeservicecompany.models.request.service.RequestService;
 import ir.maktab.homeservicecompany.models.worker.service.WorkerService;
 import ir.maktab.homeservicecompany.utils.dto.UserDTO;
+import ir.maktab.homeservicecompany.utils.exception.SaveImageException;
 import ir.maktab.homeservicecompany.utils.validation.Validation;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -49,7 +50,7 @@ public class GeneralController {
         try {
             workerSer.signUp(userDTO , image.getBytes());
         } catch (IOException e) {
-            throw new RuntimeException("image cannot be save.");
+            throw new SaveImageException("image cannot be save.");
         }
     }
 

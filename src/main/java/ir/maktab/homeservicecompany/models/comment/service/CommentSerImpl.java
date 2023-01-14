@@ -32,9 +32,10 @@ public class CommentSerImpl extends BaseServiceImpl<Comment, CommentDao> impleme
         Request request = validation.requestValidate(commentDTO.getRequestId());
         RequestStatus status = request.getStatus();
         Worker worker = request.getAcceptedOffer().getWorker();
+        Boolean commentPermit= existsByRequest(request);
         if (request.getClient() != client)
             throw new IllegalArgumentException("request doesn't belong to this client.");
-        if (existsByRequest(request))
+        if (Boolean.TRUE.equals(commentPermit))
             throw new IllegalArgumentException("this request has been already commented.");
         if (!(status == RequestStatus.COMPLETED || status == RequestStatus.PAID))
             throw new RequestStatusException("this request must be completed first.");

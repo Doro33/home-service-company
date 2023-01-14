@@ -36,7 +36,7 @@ public class WorkerController {
     }
 
     @GetMapping("/showScore/{workerId}")
-    private Long showWorkerScore(@PathVariable Long workerId){
+    public Long showWorkerScore(@PathVariable Long workerId){
         return workerSer.findById(workerId).getScore();
     }
 

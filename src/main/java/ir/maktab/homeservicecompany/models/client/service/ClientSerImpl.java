@@ -101,8 +101,7 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
     public void setRequestStatusOnStarted(Long clientId, Long requestId) {
         Client client = validation.clientValidate(clientId);
         Request request = validation.requestValidate(requestId);
-        if (request.getClient() != client)
-            throw new IllegalArgumentException("request doesn't belong to this client.");
+        checkRequestOwner(client, request);
         if (request.getStatus() != RequestStatus.WORKER_ON_THE_ROAD)
             throw new RequestStatusException("incorrect request's status for this function.");
         request.setStatus(RequestStatus.STARTED);
@@ -110,13 +109,17 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         requestSer.saveOrUpdate(request);
     }
 
+    private static void checkRequestOwner(Client client, Request request) {
+        if (request.getClient() != client)
+            throw new IllegalArgumentException("request doesn't belong to this client.");
+    }
+
     @Override
     @Transactional
     public void setRequestStatusOnCompleted(Long clientId, Long requestId) {
         Client client = validation.clientValidate(clientId);
         Request request = validation.requestValidate(requestId);
-        if (request.getClient() != client)
-            throw new IllegalArgumentException("request doesn't belong to this client.");
+        checkRequestOwner(client, request);
         if (request.getStatus() != RequestStatus.STARTED)
             throw new RequestStatusException("incorrect request's status for this function.");
         request.setStatus(RequestStatus.COMPLETED);
@@ -137,8 +140,7 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         Client client = validation.clientValidate(chooseOfferDTO.getClientId());
         Request request = validation.requestValidate(chooseOfferDTO.getRequestId());
         Offer offer = validation.offerValidate(chooseOfferDTO.getOfferId());
-        if (request.getClient() != client)
-            throw new IllegalArgumentException("request doesn't belong to this client.");
+        checkRequestOwner(client, request);
         if (offer.getRequest() != request)
             throw new IllegalArgumentException("offer doesnt belong to this request");
 
@@ -161,8 +163,7 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         Worker worker = acceptedOffer.getWorker();
         Admin admin = adminSer.findById(1L);
 
-        if (request.getClient() != client)
-            throw new IllegalArgumentException("request doesn't belong to this client.");
+        checkRequestOwner(client, request);
         if (request.getStatus() != RequestStatus.COMPLETED)
             throw new RequestStatusException("this request must be completed first.");
 

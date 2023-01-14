@@ -59,10 +59,9 @@ public class RequestSerImpl extends BaseServiceImpl<Request, RequestDao> impleme
             throw new IllegalArgumentException("propose price must be at least." + job.getMinimumPrice());
         if (requestDTO.getDate().isBefore(LocalDate.now()))
             throw new IllegalArgumentException("past date cannot be chosen.");
-        if (requestDTO.getDate().isEqual(LocalDate.now())) {
-            if (requestDTO.getSuggestedTime().isBefore(LocalTime.now().plusMinutes(30)))
+        if (requestDTO.getDate().isEqual(LocalDate.now())&&
+                requestDTO.getSuggestedTime().isBefore(LocalTime.now().plusMinutes(30)))
                 throw new IllegalArgumentException("request's suggested time must be at least 30 minuets later from now.");
-        }
         return new Request(client, job,
                 requestDTO.getProposedPrice(),
                 requestDTO.getDescription(),

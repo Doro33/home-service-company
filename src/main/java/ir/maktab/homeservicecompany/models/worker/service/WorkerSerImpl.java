@@ -121,7 +121,6 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
             throw new IllegalArgumentException("this skill has already added for this worker.");
 
         WorkerSkill workerSkill= new WorkerSkill(worker,job);
-        System.out.println(workerSkill);
         workerSkillSer.saveOrUpdate(workerSkill);
     }
 
