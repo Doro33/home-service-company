@@ -5,7 +5,6 @@ import ir.maktab.homeservicecompany.models.admin.entity.Admin;
 import ir.maktab.homeservicecompany.models.admin.service.AdminService;
 import ir.maktab.homeservicecompany.models.bank_card.dto.MoneyTransferDTO;
 import ir.maktab.homeservicecompany.models.bank_card.service.BankCardService;
-import ir.maktab.homeservicecompany.models.client.dto.ClientDTO;
 import ir.maktab.homeservicecompany.models.offer.dto.ChooseOfferDTO;
 import ir.maktab.homeservicecompany.models.offer.service.OfferService;
 import ir.maktab.homeservicecompany.models.request.entity.RequestStatus;
@@ -13,10 +12,10 @@ import ir.maktab.homeservicecompany.models.request.service.RequestService;
 import ir.maktab.homeservicecompany.models.worker.service.WorkerService;
 import ir.maktab.homeservicecompany.utils.base.service.BaseServiceImpl;
 import ir.maktab.homeservicecompany.models.client.dao.ClientDao;
-import ir.maktab.homeservicecompany.models.client.dto.ClientFilterDTO;
+import ir.maktab.homeservicecompany.models.client.dto.FilterClientDTO;
 import ir.maktab.homeservicecompany.models.client.entity.Client;
+import ir.maktab.homeservicecompany.utils.dto.UserDTO;
 import ir.maktab.homeservicecompany.utils.exception.CreditAmountException;
-import ir.maktab.homeservicecompany.utils.exception.InvalidIdException;
 import ir.maktab.homeservicecompany.utils.exception.RequestStatusException;
 import ir.maktab.homeservicecompany.models.offer.entity.Offer;
 import ir.maktab.homeservicecompany.models.request.entity.Request;
@@ -69,11 +68,11 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
     }
 
     @Override
-    public Client signUp(ClientDTO clientDTO) {
-        String firstName = clientDTO.getFirstName();
-        String lastName = clientDTO.getLastName();
-        String email = clientDTO.getEmail();
-        String password = clientDTO.getPassword();
+    public Client signUp(UserDTO userDTO) {
+        String firstName = userDTO.getFirstName();
+        String lastName = userDTO.getLastName();
+        String email = userDTO.getEmail();
+        String password = userDTO.getPassword();
 
         validation.nameValidate(firstName, lastName);
         if (findByEmail(email) != null)
@@ -184,12 +183,12 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
     }
 
     @Override
-    public List<Client> clientCriteria(ClientFilterDTO clientFilterDto) {
+    public List<Client> clientCriteria(FilterClientDTO filterClientDto) {
         List<Predicate> predicateList = new ArrayList<>();
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Client> query = criteriaBuilder.createQuery(Client.class);
         Root<Client> root = query.from(Client.class);
-        predicateMaker(clientFilterDto, predicateList, criteriaBuilder, root);
+        predicateMaker(filterClientDto, predicateList, criteriaBuilder, root);
         Predicate[] predicates = new Predicate[predicateList.size()];
         predicateList.toArray(predicates);
         query.select(root).where(predicates);
@@ -214,11 +213,11 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         return extraDuration.toHours();
     }
 
-    private void predicateMaker(ClientFilterDTO clientFilterDto, List<Predicate> predicateList,
+    private void predicateMaker(FilterClientDTO filterClientDto, List<Predicate> predicateList,
                                 CriteriaBuilder criteriaBuilder, Root<Client> root) {
-        String firstName = clientFilterDto.getFirstName();
-        String lastName = clientFilterDto.getLastName();
-        String email = clientFilterDto.getEmail();
+        String firstName = filterClientDto.getFirstName();
+        String lastName = filterClientDto.getLastName();
+        String email = filterClientDto.getEmail();
 
         if (!Strings.isNullOrEmpty(firstName)) {
             predicateList.add(criteriaBuilder
@@ -232,12 +231,12 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
             predicateList.add(criteriaBuilder
                     .like(root.get("email"), sampleMaker(email)));
         }
-        requestNumberPerdicateMaker(clientFilterDto, predicateList, criteriaBuilder, root);
+        requestNumberPredicateMaker(filterClientDto, predicateList, criteriaBuilder, root);
     }
 
-    private static void requestNumberPerdicateMaker(ClientFilterDTO clientFilterDto, List<Predicate> predicateList, CriteriaBuilder criteriaBuilder, Root<Client> root) {
-        Integer minRequestNumber = clientFilterDto.getMinRequestNumber();
-        Integer maxRequestNumber = clientFilterDto.getMaxRequestNumber();
+    private static void requestNumberPredicateMaker(FilterClientDTO filterClientDto, List<Predicate> predicateList, CriteriaBuilder criteriaBuilder, Root<Client> root) {
+        Integer minRequestNumber = filterClientDto.getMinRequestNumber();
+        Integer maxRequestNumber = filterClientDto.getMaxRequestNumber();
         if (minRequestNumber ==null)
             minRequestNumber=0;
         if (maxRequestNumber==null)

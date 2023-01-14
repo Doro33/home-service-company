@@ -2,15 +2,18 @@ package ir.maktab.homeservicecompany.utils.controller;
 
 import ir.maktab.homeservicecompany.models.category.entity.Category;
 import ir.maktab.homeservicecompany.models.category.service.CategoryService;
-import ir.maktab.homeservicecompany.models.client.dto.ClientDTO;
-import ir.maktab.homeservicecompany.models.client.entity.Client;
 import ir.maktab.homeservicecompany.models.client.service.ClientService;
 import ir.maktab.homeservicecompany.models.job.entity.Job;
 import ir.maktab.homeservicecompany.models.job.service.JobService;
 import ir.maktab.homeservicecompany.models.request.entity.Request;
 import ir.maktab.homeservicecompany.models.request.service.RequestService;
+import ir.maktab.homeservicecompany.models.worker.service.WorkerService;
+import ir.maktab.homeservicecompany.utils.dto.UserDTO;
+import ir.maktab.homeservicecompany.utils.validation.Validation;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -21,11 +24,17 @@ public class GeneralController {
     private final ClientService clientSer;
     private final RequestService requestSer;
 
-    public GeneralController(CategoryService categorySer, JobService jobSer, ClientService clientSer, RequestService requestSer) {
+    private final WorkerService workerSer;
+
+    private final Validation validation;
+
+    public GeneralController(CategoryService categorySer, JobService jobSer, ClientService clientSer, RequestService requestSer, WorkerService workerService, Validation validation) {
         this.categorySer = categorySer;
         this.jobSer = jobSer;
         this.clientSer = clientSer;
         this.requestSer = requestSer;
+        this.workerSer = workerService;
+        this.validation = validation;
     }
 
     @GetMapping("/findAllCategories")
@@ -39,8 +48,18 @@ public class GeneralController {
     }
 
     @PostMapping("/clientSignup")
-    public void clientSignUp(@RequestBody ClientDTO clientDTO) {
-        clientSer.signUp(clientDTO);
+    public void clientSignUp(@RequestBody UserDTO userDTO) {
+        clientSer.signUp(userDTO);
+    }
+
+    @PostMapping("/workerSignup")
+    void signUp(@RequestBody UserDTO userDTO, @RequestParam("image") MultipartFile image) {
+        validation.imageValidate(image);
+        try {
+            workerSer.signUp(userDTO , image.getBytes());
+        } catch (IOException e) {
+            throw new RuntimeException("image cannot be save.");
+        }
     }
 
     @GetMapping("findRequestsByJob/{id}")

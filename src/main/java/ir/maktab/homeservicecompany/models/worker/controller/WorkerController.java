@@ -3,7 +3,7 @@ package ir.maktab.homeservicecompany.models.worker.controller;
 import ir.maktab.homeservicecompany.models.offer.dto.OfferDTO;
 import ir.maktab.homeservicecompany.models.offer.entity.Offer;
 import ir.maktab.homeservicecompany.models.offer.service.OfferService;
-import ir.maktab.homeservicecompany.models.worker.dto.WorkerDto;
+import ir.maktab.homeservicecompany.utils.dto.UserDTO;
 import ir.maktab.homeservicecompany.models.worker.entity.Worker;
 import ir.maktab.homeservicecompany.models.worker.service.WorkerService;
 import ir.maktab.homeservicecompany.models.worker_skill.dto.WorkerSkillDTO;
@@ -24,24 +24,7 @@ public class WorkerController {
     private final OfferService offerSer;
     private final Validation validation;
 
-    @PostMapping("/signup")
-    @ResponseBody
-    void signUp(@RequestBody WorkerDto workerDTO, @RequestParam("image") MultipartFile image) {
-        validation.imageValidate(image);
-        try {
-            workerSer.signUp(
-                    new Worker(
-                            workerDTO.getFirstName(),
-                            workerDTO.getLastName(),
-                            workerDTO.getEmail(),
-                            workerDTO.getPassword(),
-                            image.getBytes()
-                    )
-            );
-        } catch (IOException e) {
-            throw new RuntimeException("image cannot be save.");
-        }
-    }
+
 
     @PutMapping("/changePassword")
     @ResponseBody

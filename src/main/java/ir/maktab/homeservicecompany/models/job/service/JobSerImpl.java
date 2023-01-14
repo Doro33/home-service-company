@@ -25,15 +25,18 @@ public class JobSerImpl extends BaseServiceImpl<Job, JobDao> implements JobServi
     }
 
     @Override
-    public Job addNewJob(Job job) {
-        if (job.getId()!=null)
-            throw new InvalidIdException("new job's id must be null.");
-        if (categorySer.findByName(job.getCategory().getName()).isEmpty())
-            throw new IllegalArgumentException("this category does not exist.");
-        if (findByName(job.getName())!=null)
+    public Job addNewJob(JobDTO jobDTO) {
+        String categoryName = jobDTO.getCategoryName();
+        String jobName = jobDTO.getJobName();
+        Double minPrice=jobDTO.getMinimumPrice();
+        String description = jobDTO.getDescription();
+        Category category = categorySer.findByName(categoryName)
+                .orElseThrow(()->new IllegalArgumentException("this category does not exist."));
+        if (findByName(jobName)!=null)
             throw new IllegalArgumentException("this job has already been added");
-        if (job.getMinimumPrice()<=0)
+        if (minPrice<=0)
             throw new IllegalArgumentException("minimum price must be positive.");
+        Job job = new Job(category,jobName,minPrice,description);
         return saveOrUpdate(job);
     }
 

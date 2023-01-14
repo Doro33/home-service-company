@@ -2,15 +2,16 @@ package ir.maktab.homeservicecompany.models.admin.controller;
 
 import ir.maktab.homeservicecompany.models.admin.service.AdminService;
 import ir.maktab.homeservicecompany.models.category.entity.Category;
-import ir.maktab.homeservicecompany.models.client.dto.ClientFilterDTO;
+import ir.maktab.homeservicecompany.models.client.dto.FilterClientDTO;
 import ir.maktab.homeservicecompany.models.client.entity.Client;
 import ir.maktab.homeservicecompany.models.client.service.ClientService;
 import ir.maktab.homeservicecompany.models.job.dto.JobDTO;
-import ir.maktab.homeservicecompany.models.job.entity.Job;
+import ir.maktab.homeservicecompany.models.job.service.JobService;
 import ir.maktab.homeservicecompany.models.offer.entity.Offer;
 import ir.maktab.homeservicecompany.models.offer.service.OfferService;
 import ir.maktab.homeservicecompany.models.request.entity.Request;
 import ir.maktab.homeservicecompany.models.request.service.RequestService;
+import ir.maktab.homeservicecompany.models.worker.dto.FilterWorkerDTO;
 import ir.maktab.homeservicecompany.models.worker.entity.Worker;
 import ir.maktab.homeservicecompany.models.worker.service.WorkerService;
 import ir.maktab.homeservicecompany.models.worker_skill.service.WorkerSkillService;
@@ -27,15 +28,20 @@ public class AdminController {
     private final WorkerService workerSer;
     private final OfferService offerSer;
 
+    private final JobService jobSer;
+
     private final WorkerSkillService workerSkillSer;
 
 
-    public AdminController(AdminService adminSer, ClientService clientSer, RequestService requestSer, WorkerService workerSer, OfferService offerSer, WorkerSkillService workerSkillSer) {
+    public AdminController(AdminService adminSer, ClientService clientSer, RequestService requestSer,
+                           WorkerService workerSer, OfferService offerSer, JobService jobSer,
+                           WorkerSkillService workerSkillSer) {
         this.adminSer = adminSer;
         this.clientSer = clientSer;
         this.requestSer = requestSer;
         this.workerSer = workerSer;
         this.offerSer = offerSer;
+        this.jobSer = jobSer;
         this.workerSkillSer = workerSkillSer;
     }
 
@@ -46,12 +52,7 @@ public class AdminController {
 
     @PostMapping("/addJob")
     public void addJob(@RequestBody JobDTO jobDTO) {
-        Category category = adminSer.findCategoryByName(jobDTO.getCategoryName()).get();
-        Job job = new Job(category,
-                jobDTO.getJobName(),
-                jobDTO.getMinimumPrice(),
-                jobDTO.getDescription());
-        adminSer.addNewJob(job);
+        jobSer.addNewJob(jobDTO);
     }
 
     @PutMapping("/updateJob")
@@ -100,7 +101,12 @@ public class AdminController {
     }
 
     @GetMapping("/clientsFilter")
-    public List<Client> clientsFilter(@RequestBody ClientFilterDTO clientFilterDTO){
-        return clientSer.clientCriteria(clientFilterDTO);
+    public List<Client> clientsFilter(@RequestBody FilterClientDTO filterClientDTO){
+        return clientSer.clientCriteria(filterClientDTO);
+    }
+
+    @GetMapping("/workersFilter")
+    public  List<Worker> workersFilter(@RequestBody FilterWorkerDTO filterWorkerDTO){
+        return workerSer.workerCriteria(filterWorkerDTO);
     }
 }

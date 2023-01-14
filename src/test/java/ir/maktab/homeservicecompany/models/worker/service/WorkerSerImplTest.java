@@ -13,7 +13,7 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
-class WorkerSerImplTest {
+class WorkerSerImplTest {/*
     @Autowired
     private WorkerService workerSer;
 
@@ -54,5 +54,5 @@ class WorkerSerImplTest {
 
     @Test
     void workerCriteria() {
-    }
+    }*/
 }

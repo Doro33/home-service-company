@@ -2,18 +2,17 @@ package ir.maktab.homeservicecompany.models.worker.service;
 
 import ir.maktab.homeservicecompany.models.job.entity.Job;
 import ir.maktab.homeservicecompany.models.job.service.JobService;
+import ir.maktab.homeservicecompany.models.worker.dto.FilterWorkerDTO;
+import ir.maktab.homeservicecompany.utils.dto.UserDTO;
 import ir.maktab.homeservicecompany.models.worker.entity.WorkerStatus;
 import ir.maktab.homeservicecompany.models.worker_skill.entity.WorkerSkill;
 import ir.maktab.homeservicecompany.models.worker_skill.service.WorkerSkillService;
 import ir.maktab.homeservicecompany.utils.base.service.BaseServiceImpl;
-import ir.maktab.homeservicecompany.models.offer.entity.Offer;
 import ir.maktab.homeservicecompany.models.offer.service.OfferService;
 import ir.maktab.homeservicecompany.models.worker.dao.WorkerDao;
-import ir.maktab.homeservicecompany.models.worker.dto.WorkerDto;
 import ir.maktab.homeservicecompany.models.worker.entity.Worker;
 import ir.maktab.homeservicecompany.utils.dto.PasswordDTO;
 import ir.maktab.homeservicecompany.utils.exception.AdminPermitException;
-import ir.maktab.homeservicecompany.utils.exception.InvalidIdException;
 import ir.maktab.homeservicecompany.utils.exception.NullIdException;
 import ir.maktab.homeservicecompany.utils.validation.Validation;
 import jakarta.persistence.EntityManager;
@@ -72,10 +71,15 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
     }
 
     @Override
-    public Worker signUp(Worker worker) {
-        if (worker.getId() != null) throw new InvalidIdException("new worker's id must be null.");
-        validation.nameValidate(worker.getFirstName(), worker.getLastName());
-        if (findByEmail(worker.getEmail()) != null) throw new IllegalArgumentException("this email has been used.");
+    public Worker signUp(UserDTO userDTO, byte[] image) {
+        String firstName = userDTO.getFirstName();
+        String lastName = userDTO.getLastName();
+        String email = userDTO.getEmail();
+        String password = userDTO.getPassword();
+        validation.nameValidate(firstName, lastName);
+        if (findByEmail(email) != null)
+            throw new IllegalArgumentException("this email has been used.");
+        Worker worker = new Worker(firstName,lastName,email,password , image);
         return saveOrUpdate(worker);
     }
 
@@ -92,12 +96,12 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
         return saveOrUpdate(worker);
     }
     @Override
-    public List<Worker> workerCriteria(WorkerDto workerDto) {
+    public List<Worker> workerCriteria(FilterWorkerDTO filterWorkerDTO) {
         List<Predicate> predicateList = new ArrayList<>();
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Worker> query = criteriaBuilder.createQuery(Worker.class);
         Root<Worker> root = query.from(Worker.class);
-        createPredicates(workerDto, predicateList, criteriaBuilder, root);
+        createPredicates(filterWorkerDTO, predicateList, criteriaBuilder, root);
         Predicate[] predicates = new Predicate[predicateList.size()];
         predicateList.toArray(predicates);
         query.select(root).where(predicates);
@@ -124,15 +128,7 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
         return workerSkillSer.saveOrUpdate(workerSkill);
     }
 
-    private void createPredicates(WorkerDto workerDto, List<Predicate> predicateList, CriteriaBuilder criteriaBuilder, Root<Worker> root) {
-        Long minScore = workerDto.getMinScore();
-        Long maxScore = workerDto.getMaxScore();
-        if (minScore == null && maxScore != null) {
-            predicateList.add(criteriaBuilder.between(root.get("score"), 0L, maxScore));
-        } else if (minScore != null && maxScore == null) {
-            predicateList.add(criteriaBuilder.between(root.get("score"), minScore, Long.MAX_VALUE));
-        } else if (minScore != null) {
-            predicateList.add(criteriaBuilder.between(root.get("score"), minScore, maxScore));
-        }
+    private void createPredicates(FilterWorkerDTO filterWorkerDTO, List<Predicate> predicateList, CriteriaBuilder criteriaBuilder, Root<Worker> root) {
+
     }
 }

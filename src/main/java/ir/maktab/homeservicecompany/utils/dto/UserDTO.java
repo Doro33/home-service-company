@@ -1,16 +1,13 @@
-package ir.maktab.homeservicecompany.models.worker.dto;
+package ir.maktab.homeservicecompany.utils.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class WorkerDto {
+public class UserDTO {
     private String firstName;
     private String lastName;
     private String email;
     private String password;
-
-    private Long minScore;
-    private Long maxScore;
 }

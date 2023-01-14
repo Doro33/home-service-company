@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface JobService extends BaseService<Job> {
     Job findByName(String name);
-     Job addNewJob(Job job);
+     Job addNewJob(JobDTO jobDTO);
 
      Job updateJob(JobDTO jobDTO);
 

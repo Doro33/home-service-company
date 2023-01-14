@@ -2,10 +2,8 @@ package ir.maktab.homeservicecompany.models.comment.service;
 
 import ir.maktab.homeservicecompany.models.client.entity.Client;
 import ir.maktab.homeservicecompany.models.comment.dto.CommentDTO;
-import ir.maktab.homeservicecompany.models.request.service.RequestService;
 import ir.maktab.homeservicecompany.models.worker.service.WorkerService;
 import ir.maktab.homeservicecompany.utils.base.service.BaseServiceImpl;
-import ir.maktab.homeservicecompany.models.client.service.ClientService;
 import ir.maktab.homeservicecompany.models.comment.dao.CommentDao;
 import ir.maktab.homeservicecompany.models.comment.entity.Comment;
 import ir.maktab.homeservicecompany.utils.exception.RequestStatusException;
@@ -18,16 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CommentSerImpl extends BaseServiceImpl<Comment, CommentDao> implements CommentService {
-    private final ClientService clientSer;
     private final WorkerService workerSer;
-    private final RequestService requestSer;
     private final Validation validation;
 
-    public CommentSerImpl(CommentDao repository, ClientService clientSer, WorkerService workerSer, RequestService requestSer, Validation validation) {
+    public CommentSerImpl(CommentDao repository, WorkerService workerSer, Validation validation) {
         super(repository);
-        this.clientSer = clientSer;
         this.workerSer = workerSer;
-        this.requestSer = requestSer;
         this.validation = validation;
     }
 
