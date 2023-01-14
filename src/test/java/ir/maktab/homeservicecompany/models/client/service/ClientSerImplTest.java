@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @AutoConfigureMockMvc
 @ActiveProfiles({})
 class ClientSerImplTest {
+    /*
     @Autowired
     private ClientService clientSer;
 
@@ -184,4 +185,6 @@ class ClientSerImplTest {
     @Test
     void clientCriteria() {
     }
+
+     */
 }

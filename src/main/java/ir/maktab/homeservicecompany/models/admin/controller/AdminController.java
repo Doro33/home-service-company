@@ -2,6 +2,7 @@ package ir.maktab.homeservicecompany.models.admin.controller;
 
 import ir.maktab.homeservicecompany.models.admin.service.AdminService;
 import ir.maktab.homeservicecompany.models.category.entity.Category;
+import ir.maktab.homeservicecompany.models.client.dto.ClientFilterDTO;
 import ir.maktab.homeservicecompany.models.client.entity.Client;
 import ir.maktab.homeservicecompany.models.client.service.ClientService;
 import ir.maktab.homeservicecompany.models.job.dto.JobDTO;
@@ -96,5 +97,10 @@ public class AdminController {
     @GetMapping("/showJobWorkers/{jobId}")
     public List<Worker> showJobWorkers(@PathVariable Long jobId){
         return workerSkillSer.findWorkerByJobId(jobId);
+    }
+
+    @GetMapping("/clientsFilter")
+    public List<Client> clientsFilter(@RequestBody ClientFilterDTO clientFilterDTO){
+        return clientSer.clientCriteria(clientFilterDTO);
     }
 }

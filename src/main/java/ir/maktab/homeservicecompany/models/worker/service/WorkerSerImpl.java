@@ -135,6 +135,4 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
             predicateList.add(criteriaBuilder.between(root.get("score"), minScore, maxScore));
         }
     }
-
-
 }

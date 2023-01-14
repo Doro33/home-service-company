@@ -5,6 +5,7 @@ import ir.maktab.homeservicecompany.models.admin.entity.Admin;
 import ir.maktab.homeservicecompany.models.admin.service.AdminService;
 import ir.maktab.homeservicecompany.models.bank_card.dto.MoneyTransferDTO;
 import ir.maktab.homeservicecompany.models.bank_card.service.BankCardService;
+import ir.maktab.homeservicecompany.models.client.dto.ClientDTO;
 import ir.maktab.homeservicecompany.models.offer.dto.ChooseOfferDTO;
 import ir.maktab.homeservicecompany.models.offer.service.OfferService;
 import ir.maktab.homeservicecompany.models.request.entity.RequestStatus;
@@ -12,7 +13,7 @@ import ir.maktab.homeservicecompany.models.request.service.RequestService;
 import ir.maktab.homeservicecompany.models.worker.service.WorkerService;
 import ir.maktab.homeservicecompany.utils.base.service.BaseServiceImpl;
 import ir.maktab.homeservicecompany.models.client.dao.ClientDao;
-import ir.maktab.homeservicecompany.models.client.dto.ClientDTO;
+import ir.maktab.homeservicecompany.models.client.dto.ClientFilterDTO;
 import ir.maktab.homeservicecompany.models.client.entity.Client;
 import ir.maktab.homeservicecompany.utils.exception.CreditAmountException;
 import ir.maktab.homeservicecompany.utils.exception.InvalidIdException;
@@ -68,15 +69,17 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
     }
 
     @Override
-    public Client signUp(Client client) {
-        if (client.getId() != null)
-            throw new InvalidIdException("new client's id must be null.");
-        validation.nameValidate(
-                client.getFirstName(), client.getLastName()
-        );
-        if (findByEmail(client.getEmail()) != null)
+    public Client signUp(ClientDTO clientDTO) {
+        String firstName = clientDTO.getFirstName();
+        String lastName = clientDTO.getLastName();
+        String email = clientDTO.getEmail();
+        String password = clientDTO.getPassword();
+
+        validation.nameValidate(firstName, lastName);
+        if (findByEmail(email) != null)
             throw new IllegalArgumentException("this email has been used.");
-        validation.passwordValidate(client.getPassword());
+        validation.passwordValidate(password);
+        Client client = new Client(firstName, lastName, email, password);
         return saveOrUpdate(client);
     }
 
@@ -94,11 +97,12 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         client.setPassword(newPassword1);
         return saveOrUpdate(client);
     }
+
     @Override
     public void setRequestStatusOnStarted(Long clientId, Long requestId) {
         Client client = validation.clientValidate(clientId);
         Request request = validation.requestValidate(requestId);
-        if (request.getClient()!=client)
+        if (request.getClient() != client)
             throw new IllegalArgumentException("request doesn't belong to this client.");
         if (request.getStatus() != RequestStatus.WORKER_ON_THE_ROAD)
             throw new RequestStatusException("incorrect request's status for this function.");
@@ -112,7 +116,7 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
     public void setRequestStatusOnCompleted(Long clientId, Long requestId) {
         Client client = validation.clientValidate(clientId);
         Request request = validation.requestValidate(requestId);
-        if (request.getClient()!=client)
+        if (request.getClient() != client)
             throw new IllegalArgumentException("request doesn't belong to this client.");
         if (request.getStatus() != RequestStatus.STARTED)
             throw new RequestStatusException("incorrect request's status for this function.");
@@ -127,6 +131,7 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         }
         requestSer.saveOrUpdate(request);
     }
+
     @Override
     @Transactional
     public void chooseAnOffer(ChooseOfferDTO chooseOfferDTO) {
@@ -167,24 +172,24 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
 
         client.setCredit(clientCredit - workPrice);
         saveOrUpdate(client);
-        
+
         worker.setCredit(worker.getCredit() + workPrice * 0.7);
         workerSer.saveOrUpdate(worker);
 
         admin.setCredit(admin.getCredit() + workPrice * 0.3);
         adminSer.saveOrUpdate(admin);
-        
+
         request.setStatus(RequestStatus.PAID);
         requestSer.saveOrUpdate(request);
     }
 
     @Override
-    public List<Client> clientCriteria(ClientDTO clientDto) {
+    public List<Client> clientCriteria(ClientFilterDTO clientFilterDto) {
         List<Predicate> predicateList = new ArrayList<>();
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Client> query = criteriaBuilder.createQuery(Client.class);
         Root<Client> root = query.from(Client.class);
-        predicateMaker(clientDto, predicateList, criteriaBuilder, root);
+        predicateMaker(clientFilterDto, predicateList, criteriaBuilder, root);
         Predicate[] predicates = new Predicate[predicateList.size()];
         predicateList.toArray(predicates);
         query.select(root).where(predicates);
@@ -194,12 +199,12 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
     @Override
     @Transactional
     public Client increaseCredit(Long clientId, MoneyTransferDTO moneyTransferDTO) {
-            Client client = validation.clientValidate(clientId);
-            Double amount = moneyTransferDTO.getAmount();
-            bankCardSer.moneyTransfer(moneyTransferDTO);
+        Client client = validation.clientValidate(clientId);
+        Double amount = moneyTransferDTO.getAmount();
+        bankCardSer.moneyTransfer(moneyTransferDTO);
 
-            client.setCredit(client.getCredit()+amount);
-            return saveOrUpdate(client);
+        client.setCredit(client.getCredit() + amount);
+        return saveOrUpdate(client);
     }
 
     private static Long extraHoursCalculator(Request request) {
@@ -209,24 +214,40 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         return extraDuration.toHours();
     }
 
-    private void predicateMaker(ClientDTO clientDto, List<Predicate> predicateList,
+    private void predicateMaker(ClientFilterDTO clientFilterDto, List<Predicate> predicateList,
                                 CriteriaBuilder criteriaBuilder, Root<Client> root) {
-        String firstName = clientDto.getFirstName();
-        String lastName = clientDto.getLastName();
-        String email = clientDto.getEmail();
+        String firstName = clientFilterDto.getFirstName();
+        String lastName = clientFilterDto.getLastName();
+        String email = clientFilterDto.getEmail();
 
         if (!Strings.isNullOrEmpty(firstName)) {
             predicateList.add(criteriaBuilder
-                    .like(root.get("firstname"), sampleMaker(firstName)));
+                    .like(root.get("firstName"), sampleMaker(firstName)));
         }
         if (!Strings.isNullOrEmpty(lastName)) {
             predicateList.add(criteriaBuilder
-                    .like(root.get("lastname"), sampleMaker(lastName)));
+                    .like(root.get("lastName"), sampleMaker(lastName)));
         }
         if (Strings.isNullOrEmpty(email)) {
             predicateList.add(criteriaBuilder
                     .like(root.get("email"), sampleMaker(email)));
         }
+        requestNumberPerdicateMaker(clientFilterDto, predicateList, criteriaBuilder, root);
+    }
+
+    private static void requestNumberPerdicateMaker(ClientFilterDTO clientFilterDto, List<Predicate> predicateList, CriteriaBuilder criteriaBuilder, Root<Client> root) {
+        Integer minRequestNumber = clientFilterDto.getMinRequestNumber();
+        Integer maxRequestNumber = clientFilterDto.getMaxRequestNumber();
+        if (minRequestNumber ==null)
+            minRequestNumber=0;
+        if (maxRequestNumber==null)
+            maxRequestNumber=Integer.MAX_VALUE;
+        if (maxRequestNumber < minRequestNumber)
+            throw new IllegalArgumentException("max requestNumber cannot be lesser than min requestNumber");
+        if (minRequestNumber<0)
+            throw new IllegalArgumentException("min requestNumber cannot be lesser than 0.");
+        predicateList.add(criteriaBuilder.
+                    between(root.get("requestCounter"), minRequestNumber, maxRequestNumber));
     }
 
     private String sampleMaker(String input) {

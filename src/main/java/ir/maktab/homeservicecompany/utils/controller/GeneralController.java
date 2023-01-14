@@ -19,7 +19,6 @@ public class GeneralController {
     private final CategoryService categorySer;
     private final JobService jobSer;
     private final ClientService clientSer;
-
     private final RequestService requestSer;
 
     public GeneralController(CategoryService categorySer, JobService jobSer, ClientService clientSer, RequestService requestSer) {
@@ -41,12 +40,7 @@ public class GeneralController {
 
     @PostMapping("/clientSignup")
     public void clientSignUp(@RequestBody ClientDTO clientDTO) {
-        clientSer.signUp(
-                new Client(
-                        clientDTO.getFirstName(),
-                        clientDTO.getLastName(),
-                        clientDTO.getEmail(),
-                        clientDTO.getPassword()));
+        clientSer.signUp(clientDTO);
     }
 
     @GetMapping("findRequestsByJob/{id}")
