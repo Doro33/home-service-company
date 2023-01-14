@@ -10,7 +10,7 @@ import ir.maktab.homeservicecompany.models.request.entity.Request;
 import java.util.List;
 
 public interface OfferService extends BaseService<Offer> {
-    Offer saveNewOffer(OfferDTO offerDTO);
+    void saveNewOffer(OfferDTO offerDTO);
 
     List<Offer> findByRequestOrderByExpectedPrice(Long requestId);
 

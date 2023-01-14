@@ -13,10 +13,6 @@ public interface WorkerSkillService extends BaseService<WorkerSkill> {
 
     void banWorkerSkill(Long id);
 
-    List<WorkerSkill> findByWorker(Worker worker);
-
-    List<Job> findWorkerSkills(Worker worker);
-
     boolean existsByWorkerAndJob(Worker worker, Job job);
 
     boolean canWorkerDoThisJob(Worker worker, Job job);

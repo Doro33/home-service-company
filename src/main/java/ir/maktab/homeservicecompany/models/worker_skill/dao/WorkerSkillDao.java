@@ -17,8 +17,6 @@ public interface WorkerSkillDao extends JpaRepository<WorkerSkill,Long> {
 """)
     List<Worker> findWorkerByJobId(Long jobId);
     List<WorkerSkill> findByWorker(Worker worker);
-    List<WorkerSkill> findByJob(Job job);
-
     boolean existsByWorkerAndJob(Worker worker, Job job);
 
     boolean existsByWorkerAndJobAndConfirmedByAdminIsTrue(Worker worker, Job job);

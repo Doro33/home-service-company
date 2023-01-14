@@ -19,9 +19,9 @@ public class CategorySerImpl extends BaseServiceImpl<Category, CategoryDao> impl
     }
 
     @Override
-    public Category addNewCategory(String name) {
+    public void addNewCategory(String name) {
         if (findByName(name).isPresent())
             throw new IllegalArgumentException("this category has already been  added.");
-        return saveOrUpdate(new Category(name));
+        saveOrUpdate(new Category(name));
     }
 }

@@ -6,6 +6,6 @@ import ir.maktab.homeservicecompany.utils.base.service.BaseService;
 import ir.maktab.homeservicecompany.models.comment.entity.Comment;
 
 public interface CommentService extends BaseService<Comment> {
-    Comment addComment(CommentDTO commentDTO);
+    void addComment(CommentDTO commentDTO);
     Boolean existsByRequest(Request request);
 }

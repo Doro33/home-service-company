@@ -68,7 +68,7 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
     }
 
     @Override
-    public Client signUp(UserDTO userDTO) {
+    public void signUp(UserDTO userDTO) {
         String firstName = userDTO.getFirstName();
         String lastName = userDTO.getLastName();
         String email = userDTO.getEmail();
@@ -79,11 +79,11 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
             throw new IllegalArgumentException("this email has been used.");
         validation.passwordValidate(password);
         Client client = new Client(firstName, lastName, email, password);
-        return saveOrUpdate(client);
+        saveOrUpdate(client);
     }
 
     @Override
-    public Client changePassword(String email, String oldPassword, String newPassword1, String newPassword2) {
+    public void changePassword(String email, String oldPassword, String newPassword1, String newPassword2) {
         Client client = findByEmail(email);
         if (client == null)
             throw new IllegalArgumentException("this email does not have an account.");
@@ -94,7 +94,7 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         validation.passwordValidate(newPassword1);
 
         client.setPassword(newPassword1);
-        return saveOrUpdate(client);
+        saveOrUpdate(client);
     }
 
     @Override
@@ -197,13 +197,13 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
 
     @Override
     @Transactional
-    public Client increaseCredit(Long clientId, MoneyTransferDTO moneyTransferDTO) {
+    public void increaseCredit(Long clientId, MoneyTransferDTO moneyTransferDTO) {
         Client client = validation.clientValidate(clientId);
         Double amount = moneyTransferDTO.getAmount();
         bankCardSer.moneyTransfer(moneyTransferDTO);
 
         client.setCredit(client.getCredit() + amount);
-        return saveOrUpdate(client);
+        saveOrUpdate(client);
     }
 
     private static Long extraHoursCalculator(Request request) {

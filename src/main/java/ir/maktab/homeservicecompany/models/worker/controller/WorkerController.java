@@ -3,28 +3,20 @@ package ir.maktab.homeservicecompany.models.worker.controller;
 import ir.maktab.homeservicecompany.models.offer.dto.OfferDTO;
 import ir.maktab.homeservicecompany.models.offer.entity.Offer;
 import ir.maktab.homeservicecompany.models.offer.service.OfferService;
-import ir.maktab.homeservicecompany.utils.dto.UserDTO;
-import ir.maktab.homeservicecompany.models.worker.entity.Worker;
 import ir.maktab.homeservicecompany.models.worker.service.WorkerService;
 import ir.maktab.homeservicecompany.models.worker_skill.dto.WorkerSkillDTO;
 import ir.maktab.homeservicecompany.utils.dto.PasswordDTO;
-import ir.maktab.homeservicecompany.utils.validation.Validation;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/worker")
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class WorkerController {
     private final WorkerService workerSer;
     private final OfferService offerSer;
-    private final Validation validation;
-
-
 
     @PutMapping("/changePassword")
     @ResponseBody

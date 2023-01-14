@@ -12,9 +12,9 @@ import java.util.List;
 public interface ClientService extends BaseService<Client> {
     Client findByEmail(String email);
 
-    Client signUp(UserDTO userDTO);
+    void signUp(UserDTO userDTO);
 
-    Client changePassword(String email, String oldPassword, String newPassword1, String newPassword2);
+    void changePassword(String email, String oldPassword, String newPassword1, String newPassword2);
     void setRequestStatusOnStarted(Long clientId, Long requestId);
     void setRequestStatusOnCompleted(Long clientId, Long requestId);
 
@@ -24,6 +24,6 @@ public interface ClientService extends BaseService<Client> {
 
     List<Client> clientCriteria(FilterClientDTO filterClientDto);
 
-    Client increaseCredit(Long clientId, MoneyTransferDTO moneyTransferDTO);
+    void increaseCredit(Long clientId, MoneyTransferDTO moneyTransferDTO);
 
 }

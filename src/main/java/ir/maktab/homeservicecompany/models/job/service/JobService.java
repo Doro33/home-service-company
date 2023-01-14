@@ -6,12 +6,13 @@ import ir.maktab.homeservicecompany.utils.base.service.BaseService;
 import ir.maktab.homeservicecompany.models.job.entity.Job;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface JobService extends BaseService<Job> {
-    Job findByName(String name);
-     Job addNewJob(JobDTO jobDTO);
+    Optional<Job> findByName(String name);
+     void addNewJob(JobDTO jobDTO);
 
-     Job updateJob(JobDTO jobDTO);
+     void updateJob(JobDTO jobDTO);
 
     List<Job> findByCategory(Category category);
 }

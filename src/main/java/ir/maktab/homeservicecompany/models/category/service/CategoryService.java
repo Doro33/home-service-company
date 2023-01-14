@@ -8,5 +8,5 @@ import java.util.Optional;
 public interface CategoryService extends BaseService<Category> {
     Optional<Category> findByName(String name);
 
-    Category addNewCategory(String name);
+    void addNewCategory(String name);
 }

@@ -10,6 +10,7 @@ import ir.maktab.homeservicecompany.models.request.service.RequestService;
 import ir.maktab.homeservicecompany.models.worker.service.WorkerService;
 import ir.maktab.homeservicecompany.utils.dto.UserDTO;
 import ir.maktab.homeservicecompany.utils.validation.Validation;
+import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,24 +19,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/general")
+@AllArgsConstructor
 public class GeneralController {
     private final CategoryService categorySer;
     private final JobService jobSer;
     private final ClientService clientSer;
     private final RequestService requestSer;
-
     private final WorkerService workerSer;
-
     private final Validation validation;
-
-    public GeneralController(CategoryService categorySer, JobService jobSer, ClientService clientSer, RequestService requestSer, WorkerService workerService, Validation validation) {
-        this.categorySer = categorySer;
-        this.jobSer = jobSer;
-        this.clientSer = clientSer;
-        this.requestSer = requestSer;
-        this.workerSer = workerService;
-        this.validation = validation;
-    }
 
     @GetMapping("/findAllCategories")
     public List<Category> findAllCategories() {
@@ -53,7 +44,7 @@ public class GeneralController {
     }
 
     @PostMapping("/workerSignup")
-    void signUp(@RequestBody UserDTO userDTO, @RequestParam("image") MultipartFile image) {
+    void workerSignUp(@RequestBody UserDTO userDTO, @RequestParam("image") MultipartFile image) {
         validation.imageValidate(image);
         try {
             workerSer.signUp(userDTO , image.getBytes());

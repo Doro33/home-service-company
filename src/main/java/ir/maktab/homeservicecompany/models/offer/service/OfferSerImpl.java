@@ -23,7 +23,8 @@ import java.util.List;
 
 @Service
 public class OfferSerImpl extends BaseServiceImpl<Offer, OfferDao> implements OfferService {
-    public OfferSerImpl(OfferDao repository, WorkerService workerSer, @Lazy RequestService requestSer, WorkerSkillService workerSkillSer, Validation validation) {
+    public OfferSerImpl(OfferDao repository, WorkerService workerSer, @Lazy RequestService requestSer,
+                        WorkerSkillService workerSkillSer, Validation validation) {
         super(repository);
         this.workerSer = workerSer;
         this.requestSer = requestSer;
@@ -38,7 +39,7 @@ public class OfferSerImpl extends BaseServiceImpl<Offer, OfferDao> implements Of
 
     @Override
     @Transactional
-    public Offer saveNewOffer(OfferDTO offerDTO) {
+    public void saveNewOffer(OfferDTO offerDTO) {
         Worker worker = validation.workerValidate(offerDTO.getWorkerId());
         Request request = validation.requestValidate(offerDTO.getRequestId());
         offerCustomValidate(offerDTO, worker, request);
@@ -53,7 +54,7 @@ public class OfferSerImpl extends BaseServiceImpl<Offer, OfferDao> implements Of
         worker.setOfferCounter(worker.getOfferCounter() + 1);
         workerSer.saveOrUpdate(worker);
 
-        return saveOrUpdate(offer);
+        saveOrUpdate(offer);
     }
 
     @Override

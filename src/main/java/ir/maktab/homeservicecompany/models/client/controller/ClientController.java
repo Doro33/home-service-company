@@ -11,14 +11,14 @@ import ir.maktab.homeservicecompany.models.request.dto.RequestDTO;
 import ir.maktab.homeservicecompany.models.request.entity.Request;
 import ir.maktab.homeservicecompany.models.request.service.RequestService;
 import ir.maktab.homeservicecompany.utils.dto.PasswordDTO;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/client")
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class ClientController {
     private final ClientService clientSer;
     private final RequestService requestSer;

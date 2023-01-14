@@ -27,7 +27,7 @@ public class CommentSerImpl extends BaseServiceImpl<Comment, CommentDao> impleme
 
     @Override
     @Transactional
-    public Comment addComment(CommentDTO commentDTO) {
+    public void addComment(CommentDTO commentDTO) {
         Client client = validation.clientValidate(commentDTO.getClientId());
         Request request = validation.requestValidate(commentDTO.getRequestId());
         RequestStatus status = request.getStatus();
@@ -43,7 +43,7 @@ public class CommentSerImpl extends BaseServiceImpl<Comment, CommentDao> impleme
         workerSer.saveOrUpdate(worker);
 
         Comment comment = new Comment(request, commentDTO.getRating(), commentDTO.getDescription());
-        return saveOrUpdate(comment);
+        saveOrUpdate(comment);
     }
 
     @Override

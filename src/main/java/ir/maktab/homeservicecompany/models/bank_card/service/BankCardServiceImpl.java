@@ -20,7 +20,7 @@ public class BankCardServiceImpl extends BaseServiceImpl<BankCard, BankCardDao> 
     }
 
     @Override
-    public BankCard moneyTransfer(MoneyTransferDTO cardDTO) {
+    public void moneyTransfer(MoneyTransferDTO cardDTO) {
         BankCard card = findByCardNumber(cardDTO.getCardNumber());
         Double amount = cardDTO.getAmount();
         if (amount==null)
@@ -39,6 +39,6 @@ public class BankCardServiceImpl extends BaseServiceImpl<BankCard, BankCardDao> 
             throw new CreditAmountException("bank card's credit is not enough.");
 
         card.setCredit(card.getCredit()-amount);
-        return saveOrUpdate(card);
+        saveOrUpdate(card);
     }
 }

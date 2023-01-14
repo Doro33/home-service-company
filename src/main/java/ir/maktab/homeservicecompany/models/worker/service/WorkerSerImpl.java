@@ -8,7 +8,6 @@ import ir.maktab.homeservicecompany.models.worker.entity.WorkerStatus;
 import ir.maktab.homeservicecompany.models.worker_skill.entity.WorkerSkill;
 import ir.maktab.homeservicecompany.models.worker_skill.service.WorkerSkillService;
 import ir.maktab.homeservicecompany.utils.base.service.BaseServiceImpl;
-import ir.maktab.homeservicecompany.models.offer.service.OfferService;
 import ir.maktab.homeservicecompany.models.worker.dao.WorkerDao;
 import ir.maktab.homeservicecompany.models.worker.entity.Worker;
 import ir.maktab.homeservicecompany.utils.dto.PasswordDTO;
@@ -21,7 +20,6 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -33,14 +31,13 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
     @PersistenceContext
     private EntityManager em;
 
-    public WorkerSerImpl(WorkerDao repository, @Lazy OfferService offerSer, JobService jobSer, WorkerSkillService workerSkillSer, Validation validation) {
+    public WorkerSerImpl(WorkerDao repository, JobService jobSer, WorkerSkillService workerSkillSer, Validation validation) {
         super(repository);
-        this.offerSer = offerSer;
         this.jobSer = jobSer;
         this.workerSkillSer = workerSkillSer;
         this.validation = validation;
     }
-    private final OfferService offerSer;
+
     private final JobService jobSer;
     private final WorkerSkillService workerSkillSer;
     private final Validation validation;
@@ -51,7 +48,7 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
     }
 
     @Override
-    public Worker changePassword(PasswordDTO passwordDTO) {
+    public void changePassword(PasswordDTO passwordDTO) {
         String email= passwordDTO.getEmail();
         String oldPassword = passwordDTO.getOldPassword();
         String newPassword1 = passwordDTO.getNewPassword1();
@@ -67,11 +64,11 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
         validation.passwordValidate(newPassword1);
 
         worker.setPassword(newPassword1);
-        return saveOrUpdate(worker);
+        saveOrUpdate(worker);
     }
 
     @Override
-    public Worker signUp(UserDTO userDTO, byte[] image) {
+    public void signUp(UserDTO userDTO, byte[] image) {
         String firstName = userDTO.getFirstName();
         String lastName = userDTO.getLastName();
         String email = userDTO.getEmail();
@@ -80,11 +77,11 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
         if (findByEmail(email) != null)
             throw new IllegalArgumentException("this email has been used.");
         Worker worker = new Worker(firstName,lastName,email,password , image);
-        return saveOrUpdate(worker);
+        saveOrUpdate(worker);
     }
 
     @Override
-    public Worker confirmWorker(Long id) {
+    public void confirmWorker(Long id) {
         if (id==null)
             throw new NullIdException("worker id cannot be null.");
         Worker worker = findById(id);
@@ -93,7 +90,7 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
         if (worker.getStatus()== WorkerStatus.CONFIRMED)
             throw new AdminPermitException("worker has been already confirmed.");
         worker.setStatus(WorkerStatus.CONFIRMED);
-        return saveOrUpdate(worker);
+        saveOrUpdate(worker);
     }
     @Override
     public List<Worker> workerCriteria(FilterWorkerDTO filterWorkerDTO) {
@@ -109,7 +106,7 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
     }
 
     @Override
-    public WorkerSkill addSkill(Long workerId,Long jobId) {
+    public void addSkill(Long workerId,Long jobId) {
         if (workerId==null)
             throw new NullIdException("worker id cannot be null.");
         if (jobId==null)
@@ -125,7 +122,7 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
 
         WorkerSkill workerSkill= new WorkerSkill(worker,job);
         System.out.println(workerSkill);
-        return workerSkillSer.saveOrUpdate(workerSkill);
+        workerSkillSer.saveOrUpdate(workerSkill);
     }
 
     private void createPredicates(FilterWorkerDTO filterWorkerDTO, List<Predicate> predicateList, CriteriaBuilder criteriaBuilder, Root<Worker> root) {

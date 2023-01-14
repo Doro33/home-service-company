@@ -43,16 +43,6 @@ public class WorkerSkillSerImpl extends BaseServiceImpl<WorkerSkill,WorkerSkillD
     }
 
     @Override
-    public List<WorkerSkill> findByWorker(Worker worker) {
-        return repository.findByWorker(worker);
-    }
-
-    @Override
-    public List<Job> findWorkerSkills(Worker worker) {
-        return findByWorker(worker).stream().map(WorkerSkill::getJob).toList();
-    }
-
-    @Override
     public boolean existsByWorkerAndJob(Worker worker, Job job) {
         return repository.existsByWorkerAndJob(worker,job);
     }

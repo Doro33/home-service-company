@@ -16,14 +16,14 @@ public interface OfferDao extends JpaRepository<Offer,Long> {
     @Query("""
            select o from Offer as o
            where o.request.id = :requestId
-           and  o.request.acceptedOffer is null 
+           and  o.request.acceptedOffer is null
            order by o.expectedPrice
 """)
     List<Offer> findByRequestOrderByExpectedPrice(Long requestId);
     @Query("""
            select o from Offer as o
            where o.request.id = :requestId
-           and  o.request.acceptedOffer is null 
+           and  o.request.acceptedOffer is null
            order by o.worker.score
 """)
     List<Offer> findByRequestOrderByWorkerScore(Long requestId);

@@ -30,7 +30,7 @@ public class RequestSerImpl extends BaseServiceImpl<Request, RequestDao> impleme
 
 
     @Override
-    public Request saveNewRequest(RequestDTO requestDTO) {
+    public void saveNewRequest(RequestDTO requestDTO) {
         Client client = validation.clientValidate(requestDTO.getClientId());
         Job job = validation.jobValidate(requestDTO.getJobId());
         Request request = requestMaker(requestDTO, client, job);
@@ -39,7 +39,7 @@ public class RequestSerImpl extends BaseServiceImpl<Request, RequestDao> impleme
                 client.getRequestCounter()+1
         );
         clientSer.saveOrUpdate(client);
-        return saveOrUpdate(request);
+        saveOrUpdate(request);
     }
 
     @Override
