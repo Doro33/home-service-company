@@ -29,6 +29,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +44,7 @@ import java.util.Optional;
 public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements ClientService {
     public ClientSerImpl(ClientDao repository, @Lazy AdminService adminSer, WorkerService workerSer,
                          @Lazy RequestService requestSer, OfferService offerSer, BankCardService bankCardSer,
-                         Validation validation) {
+                         Validation validation, BCryptPasswordEncoder passwordEncoder) {
         super(repository);
         this.adminSer = adminSer;
         this.workerSer = workerSer;
@@ -51,6 +52,7 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         this.offerSer = offerSer;
         this.bankCardSer = bankCardSer;
         this.validation = validation;
+        this.passwordEncoder = passwordEncoder;
     }
 
     private final AdminService adminSer;
@@ -61,6 +63,8 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
 
     private final BankCardService bankCardSer;
     private final Validation validation;
+
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @PersistenceContext
     private EntityManager em;
@@ -83,7 +87,7 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         if (findByEmail(email).isPresent())
             throw new IllegalArgumentException("this email has been used.");
 
-        Client client = new Client(firstName, lastName, email, password);
+        Client client = new Client(firstName, lastName, email, passwordEncoder.encode(password));
         saveOrUpdate(client);
     }
 
@@ -236,7 +240,9 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         requestNumberPredicateMaker(filterClientDto, predicateList, criteriaBuilder, root);
     }
 
-    private static void requestNumberPredicateMaker(FilterClientDTO filterClientDto, List<Predicate> predicateList, CriteriaBuilder criteriaBuilder, Root<Client> root) {
+    private static void requestNumberPredicateMaker(FilterClientDTO filterClientDto,
+                                                    List<Predicate> predicateList, CriteriaBuilder criteriaBuilder,
+                                                    Root<Client> root) {
         Integer minRequestNumber = filterClientDto.getMinRequestNumber();
         Integer maxRequestNumber = filterClientDto.getMaxRequestNumber();
         if (minRequestNumber == null)

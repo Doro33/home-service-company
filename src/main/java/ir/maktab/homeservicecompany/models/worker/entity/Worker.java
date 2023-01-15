@@ -1,14 +1,20 @@
 package ir.maktab.homeservicecompany.models.worker.entity;
 
 import ir.maktab.homeservicecompany.utils.base.entity.BaseEntity;
+import ir.maktab.homeservicecompany.utils.config.Role;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -17,7 +23,7 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @NotNull
-public class Worker extends BaseEntity {
+public class Worker extends BaseEntity implements UserDetails {
     public Worker(String firstName, String lastName, String email, String password, byte[] image) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -58,6 +64,9 @@ public class Worker extends BaseEntity {
 
     private Integer completedTaskCounter;
 
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     public void extraHourPenalty(Long extraHours) {
         if (extraHours > 0)
             score -= extraHours;
@@ -72,5 +81,35 @@ public class Worker extends BaseEntity {
 
     public void completedRequestEffect(){
         completedTaskCounter++;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(getRole().name()));
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }
