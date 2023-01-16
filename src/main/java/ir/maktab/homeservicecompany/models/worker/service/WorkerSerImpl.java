@@ -130,9 +130,41 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
             predicateList.add(criteriaBuilder
                     .like(root.get("email"), sampleMaker(email)));
         }
+        scorePredicateMaker(filterWorkerDTO, predicateList, criteriaBuilder, root);
+        completedTaskPredicateMaker(filterWorkerDTO,predicateList,criteriaBuilder,root);
     }
 
     private String sampleMaker(String input) {
         return "%" + input + "%";
+    }
+
+    private static void scorePredicateMaker(FilterWorkerDTO filterWorkerDTO, List<Predicate> predicateList,
+                                            CriteriaBuilder criteriaBuilder, Root<Worker> root) {
+        Long minScore = filterWorkerDTO.getMinScore();
+        Long maxScore = filterWorkerDTO.getMaxScore();
+        if (minScore == null)
+            minScore = Long.MIN_VALUE;
+        if (maxScore == null)
+            maxScore = Long.MAX_VALUE;
+        if (maxScore < minScore)
+            throw new IllegalArgumentException("max score cannot be lesser than min score");
+        predicateList.add(criteriaBuilder.
+                between(root.get("score"), minScore, maxScore));
+    }
+
+    private static void completedTaskPredicateMaker(FilterWorkerDTO filterWorkerDTO, List<Predicate> predicateList,
+                                                    CriteriaBuilder criteriaBuilder, Root<Worker> root) {
+        Integer minCompletedTask = filterWorkerDTO.getMinCompletedTask();
+        Integer maxCompletedTask = filterWorkerDTO.getMaxCompletedTask();
+        if (minCompletedTask == null)
+            minCompletedTask = 0;
+         if (maxCompletedTask==null)
+             maxCompletedTask=Integer.MAX_VALUE;
+         if (maxCompletedTask<minCompletedTask)
+             throw new IllegalArgumentException("max completed tasks cannot be lesser than min completed task");
+        if (minCompletedTask < 0)
+            throw new IllegalArgumentException("min completed tasks cannot be lesser than 0.");
+        predicateList.add(criteriaBuilder.
+                between(root.get("completedTaskCounter"), minCompletedTask, maxCompletedTask));
     }
 }
