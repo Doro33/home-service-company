@@ -1,5 +1,6 @@
 package ir.maktab.homeservicecompany.models.worker.service;
 
+import com.google.common.base.Strings;
 import ir.maktab.homeservicecompany.models.job.entity.Job;
 import ir.maktab.homeservicecompany.models.job.service.JobService;
 import ir.maktab.homeservicecompany.models.worker.dto.FilterWorkerDTO;
@@ -93,7 +94,7 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Worker> query = criteriaBuilder.createQuery(Worker.class);
         Root<Worker> root = query.from(Worker.class);
-        createPredicates(filterWorkerDTO, predicateList, criteriaBuilder, root);
+        predicateMaker(filterWorkerDTO, predicateList, criteriaBuilder, root);
         Predicate[] predicates = new Predicate[predicateList.size()];
         predicateList.toArray(predicates);
         query.select(root).where(predicates);
@@ -120,7 +121,27 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
     }
 
 
-    private void createPredicates(FilterWorkerDTO filterWorkerDTO, List<Predicate> predicateList, CriteriaBuilder criteriaBuilder, Root<Worker> root) {
+    private void predicateMaker(FilterWorkerDTO filterWorkerDTO, List<Predicate> predicateList,
+                                CriteriaBuilder criteriaBuilder, Root<Worker> root) {
+        String firstName = filterWorkerDTO.getFirstName();
+        String lastName = filterWorkerDTO.getLastName();
+        String email = filterWorkerDTO.getEmail();
 
+        if (!Strings.isNullOrEmpty(firstName)) {
+            predicateList.add(criteriaBuilder
+                    .like(root.get("firstName"), sampleMaker(firstName)));
+        }
+        if (!Strings.isNullOrEmpty(lastName)) {
+            predicateList.add(criteriaBuilder
+                    .like(root.get("lastName"), sampleMaker(lastName)));
+        }
+        if (Strings.isNullOrEmpty(email)) {
+            predicateList.add(criteriaBuilder
+                    .like(root.get("email"), sampleMaker(email)));
+        }
+    }
+
+    private String sampleMaker(String input) {
+        return "%" + input + "%";
     }
 }
