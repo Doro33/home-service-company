@@ -34,10 +34,14 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        System.out.println(email);
         Optional<Admin> admin = adminSer.findByEmail(email);
         Optional<Worker> worker = workerSer.findByEmail(email);
         Optional<Client> client = clientSer.findByEmail(email);
-
+        System.out.println(1111111);
+        System.out.println(admin.orElse(null));
+        System.out.println(worker.orElse(null));
+        System.out.println(client.orElse(null));
         if (admin.isPresent())
             return admin.get();
         if (worker.isPresent())
@@ -45,6 +49,6 @@ public class UserService implements UserDetailsService {
         if (client.isPresent())
             return client.get();
 
-        throw new IllegalArgumentException("invalid input");
+        throw new UsernameNotFoundException("invalid input");
     }
 }

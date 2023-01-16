@@ -2,6 +2,7 @@ package ir.maktab.homeservicecompany.utils.controller;
 
 import ir.maktab.homeservicecompany.models.category.entity.Category;
 import ir.maktab.homeservicecompany.models.category.service.CategoryService;
+import ir.maktab.homeservicecompany.models.client.entity.Client;
 import ir.maktab.homeservicecompany.models.client.service.ClientService;
 import ir.maktab.homeservicecompany.models.job.entity.Job;
 import ir.maktab.homeservicecompany.models.job.service.JobService;
@@ -54,8 +55,13 @@ public class GeneralController {
         }
     }
 
-    @GetMapping("findRequestsByJob/{id}")
+    @GetMapping("/findRequestsByJob/{id}")
     public List<Request> findRequestsByJobId(@PathVariable Long id){
         return requestSer.findByJob(id);
+    }
+
+    @GetMapping("hi/{email}")
+    public Client findClient(@PathVariable String email){
+        return clientSer.findByEmail(email).get();
     }
 }
