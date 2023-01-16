@@ -13,7 +13,9 @@ import ir.maktab.homeservicecompany.models.worker.entity.Worker;
 import ir.maktab.homeservicecompany.models.worker.service.WorkerService;
 import ir.maktab.homeservicecompany.utils.dto.PasswordDTO;
 import ir.maktab.homeservicecompany.utils.exception.NullIdException;
+import ir.maktab.homeservicecompany.utils.service.UserService;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,33 +27,20 @@ public class Validation {
     private final RequestService requestSer;
     private final WorkerService workerSer;
     private final OfferService offerSer;
-
     private final JobService jobSer;
+    private final UserService userSer;
 
-    public Validation(@Lazy ClientService clientSer,@Lazy RequestService requestSer, @Lazy WorkerService workerSer,
-                      @Lazy OfferService offerSer,@Lazy JobService jobSer) {
+    private PasswordEncoder passEncoder;
+
+    public Validation(@Lazy ClientService clientSer, @Lazy RequestService requestSer, @Lazy WorkerService workerSer,
+                      @Lazy OfferService offerSer, @Lazy JobService jobSer, UserService userSer) {
         this.clientSer = clientSer;
         this.requestSer = requestSer;
         this.workerSer = workerSer;
         this.offerSer = offerSer;
         this.jobSer = jobSer;
+        this.userSer = userSer;
     }
-
-    public void nameValidate(String firstName, String lastName) {
-        if (Strings.isNullOrEmpty(firstName))
-            throw new IllegalArgumentException("first name cannot be null or empty.");
-        if (Strings.isNullOrEmpty(lastName))
-            throw new IllegalArgumentException("last name cannot be null or empty.");
-    }
-
-    public void passwordValidate(String password) {
-        if (!password.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8}$"))
-            throw new IllegalArgumentException("""
-                     password must contain at least 1 uppercase or lowercase and 1 digit.
-                     password must have exactly 8 characters.
-                    """);
-    }
-
     public void imageValidate(MultipartFile image) {
         String[] choppedName = image.getName().split("\\.");
         int lastIndex = choppedName.length - 1;
@@ -96,11 +85,17 @@ public class Validation {
         String oldPassword = passwordDTO.getOldPassword();
         String newPassword1 = passwordDTO.getNewPassword1();
         String newPassword2 = passwordDTO.getNewPassword2();
-        if (!oldPassword.equals(truePassword))
-            throw new IllegalArgumentException("incorrect password");
         if (!newPassword2.matches(newPassword1))
             throw new IllegalArgumentException("new passwords are not match.");
-        passwordValidate(newPassword1);
+        if (!passEncoder.matches(oldPassword,truePassword))
+            throw new IllegalArgumentException("incorrect password");
         return newPassword1;
+    }
+
+    public void emailValidation (String email){
+        if (Strings.isNullOrEmpty(email))
+            throw new IllegalArgumentException("email cannot be empty.");
+        if (!userSer.signUpPermit(email))
+            throw new IllegalArgumentException("this email has been used already");
     }
 }

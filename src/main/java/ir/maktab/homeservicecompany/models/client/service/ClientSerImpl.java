@@ -29,7 +29,6 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,7 +43,7 @@ import java.util.Optional;
 public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements ClientService {
     public ClientSerImpl(ClientDao repository, @Lazy AdminService adminSer, WorkerService workerSer,
                          @Lazy RequestService requestSer, OfferService offerSer, BankCardService bankCardSer,
-                         Validation validation, BCryptPasswordEncoder passwordEncoder) {
+                         Validation validation) {
         super(repository);
         this.adminSer = adminSer;
         this.workerSer = workerSer;
@@ -52,20 +51,14 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         this.offerSer = offerSer;
         this.bankCardSer = bankCardSer;
         this.validation = validation;
-        this.passwordEncoder = passwordEncoder;
     }
 
     private final AdminService adminSer;
     private final WorkerService workerSer;
-
     private final RequestService requestSer;
     private final OfferService offerSer;
-
     private final BankCardService bankCardSer;
     private final Validation validation;
-
-    private final BCryptPasswordEncoder passwordEncoder;
-
     @PersistenceContext
     private EntityManager em;
 
@@ -76,18 +69,13 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
 
     @Override
     public void signUp(UserDTO userDTO) {
-        String firstName = userDTO.getFirstName();
-        String lastName = userDTO.getLastName();
         String email = userDTO.getEmail();
-        String password = userDTO.getPassword();
-
-        validation.nameValidate(firstName, lastName);
-        validation.passwordValidate(password);
-
-        if (findByEmail(email).isPresent())
-            throw new IllegalArgumentException("this email has been used.");
-
-        Client client = new Client(firstName, lastName, email, passwordEncoder.encode(password));
+        validation.emailValidation(email);
+        Client client = new Client(
+                userDTO.getFirstName(),
+                userDTO.getLastName(),
+                userDTO.getPassword(),
+                email);
         saveOrUpdate(client);
     }
 
@@ -96,9 +84,6 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         Client client = findByEmail(passwordDTO.getEmail()).
                 orElseThrow(() -> new IllegalArgumentException("this email does not have an account."));
         String newPassword = validation.checkPasswords(passwordDTO, client.getPassword());
-
-        client.setPassword(newPassword);
-        saveOrUpdate(client);
 
         client.setPassword(newPassword);
         saveOrUpdate(client);
@@ -208,10 +193,12 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         client.setCredit(client.getCredit() + amount);
         saveOrUpdate(client);
     }
+
     private static void checkRequestOwner(Client client, Request request) {
         if (request.getClient() != client)
             throw new IllegalArgumentException("request doesn't belong to this client.");
     }
+
     private static Long extraHoursCalculator(Request request) {
         Duration actualDuration = Duration.between(request.getStartAt(), request.getEndAt());
         Duration expectedDuration = request.getAcceptedOffer().getExpectedDuration();

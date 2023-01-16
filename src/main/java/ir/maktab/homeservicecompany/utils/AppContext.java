@@ -8,7 +8,6 @@ import java.util.Random;
 public class AppContext {
     @Getter
     private static final  Random RANDOM = new Random();
-
     private AppContext() {
     }
 }

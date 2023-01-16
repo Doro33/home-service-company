@@ -1,7 +1,6 @@
 package ir.maktab.homeservicecompany.models.admin.dao;
 
 import ir.maktab.homeservicecompany.models.admin.entity.Admin;
-import ir.maktab.homeservicecompany.models.client.entity.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

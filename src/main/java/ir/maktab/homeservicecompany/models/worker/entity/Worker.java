@@ -1,12 +1,13 @@
 package ir.maktab.homeservicecompany.models.worker.entity;
 
+import com.google.common.base.Strings;
 import ir.maktab.homeservicecompany.utils.base.entity.BaseEntity;
-import ir.maktab.homeservicecompany.utils.config.Role;
+import ir.maktab.homeservicecompany.utils.security.config.PasswordConfig;
+import ir.maktab.homeservicecompany.utils.security.Role;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,11 +25,11 @@ import java.util.List;
 @ToString
 @NotNull
 public class Worker extends BaseEntity implements UserDetails {
-    public Worker(String firstName, String lastName, String email, String password, byte[] image) {
-        this.firstName = firstName;
-        this.lastName = lastName;
+    public Worker(String firstName, String lastName, String password, String email, byte[] image) {
+        setFirstName(firstName);
+        setLastName(lastName);
+        setPassword(password);
         this.email = email;
-        this.password = password;
         this.createdAt = LocalDateTime.now();
         this.credit = 0D;
         this.status = WorkerStatus.AWAITING_FOR_CONFIRM;
@@ -37,19 +38,15 @@ public class Worker extends BaseEntity implements UserDetails {
         this.commentCounter = 0;
         this.offerCounter = 0;
         this.completedTaskCounter =0;
+        this.role=Role.ROLE_WORKER;
     }
 
     private String firstName;
     private String lastName;
+    private String password;
     @Column(unique = true)
     @Email
     private String email;
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8}$",
-            message = """
-                    password must contain at least 1 uppercase or lowercase and 1 digit.
-                    password must have exactly 8 characters.
-                    """)
-    private String password;
     private LocalDateTime createdAt;
     private Double credit;
     @Enumerated(EnumType.STRING)
@@ -66,6 +63,25 @@ public class Worker extends BaseEntity implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    public void setFirstName(String firstName) {
+        if (Strings.isNullOrEmpty(firstName))
+            throw new IllegalArgumentException("first name cannot be null or empty.");
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        if (Strings.isNullOrEmpty(lastName))
+            throw new IllegalArgumentException("last name cannot be null or empty.");
+        this.lastName = lastName;
+    }
+
+    public void setPassword(String password) {
+        if (!password.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8}$"))
+            throw new IllegalArgumentException(
+                    "password must have exactly 8 characters and contains at least 1 digit and 1 alphabet.");
+        this.password = PasswordConfig.passwordEncoder().encode(password);
+    }
 
     public void extraHourPenalty(Long extraHours) {
         if (extraHours > 0)

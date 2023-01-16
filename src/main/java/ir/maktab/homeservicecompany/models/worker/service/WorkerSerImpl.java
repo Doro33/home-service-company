@@ -51,7 +51,7 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
     @Override
     public void changePassword(PasswordDTO passwordDTO) {
         Worker worker = findByEmail(passwordDTO.getEmail())
-                .orElseThrow(()->new IllegalArgumentException("this email does not have an account."));
+                .orElseThrow(() -> new IllegalArgumentException("this email does not have an account."));
 
         String newPassword = validation.checkPasswords(passwordDTO, worker.getPassword());
 
@@ -62,29 +62,31 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
 
     @Override
     public void signUp(UserDTO userDTO, byte[] image) {
-        String firstName = userDTO.getFirstName();
-        String lastName = userDTO.getLastName();
         String email = userDTO.getEmail();
-        String password = userDTO.getPassword();
-        validation.nameValidate(firstName, lastName);
-        if (findByEmail(email).isPresent())
-            throw new IllegalArgumentException("this email has been used.");
-        Worker worker = new Worker(firstName,lastName,email,password , image);
+        validation.emailValidation(email);
+
+        Worker worker = new Worker(
+                userDTO.getFirstName(),
+                userDTO.getLastName(),
+                userDTO.getPassword(),
+                email,
+                image);
         saveOrUpdate(worker);
     }
 
     @Override
     public void confirmWorker(Long id) {
-        if (id==null)
+        if (id == null)
             throw new NullIdException("worker id cannot be null.");
         Worker worker = findById(id);
-        if (worker.getStatus()== WorkerStatus.SUSPENDED)
+        if (worker.getStatus() == WorkerStatus.SUSPENDED)
             throw new AdminPermitException("worker has been suspended.");
-        if (worker.getStatus()== WorkerStatus.CONFIRMED)
+        if (worker.getStatus() == WorkerStatus.CONFIRMED)
             throw new AdminPermitException("worker has been already confirmed.");
         worker.setStatus(WorkerStatus.CONFIRMED);
         saveOrUpdate(worker);
     }
+
     @Override
     public List<Worker> workerCriteria(FilterWorkerDTO filterWorkerDTO) {
         List<Predicate> predicateList = new ArrayList<>();
@@ -99,24 +101,23 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
     }
 
     @Override
-    public void addSkill(Long workerId,Long jobId) {
-        if (workerId==null)
+    public void addSkill(Long workerId, Long jobId) {
+        if (workerId == null)
             throw new NullIdException("worker id cannot be null.");
-        if (jobId==null)
+        if (jobId == null)
             throw new NullIdException("job id cannot be null.");
 
         Worker worker = findById(workerId);
         Job job = jobSer.findById(jobId);
-        if (worker.getStatus()!=WorkerStatus.CONFIRMED)
+        if (worker.getStatus() != WorkerStatus.CONFIRMED)
             throw new IllegalArgumentException("worker has not been confirmed.");
 
-        if (workerSkillSer.existsByWorkerAndJob(worker,job))
+        if (workerSkillSer.existsByWorkerAndJob(worker, job))
             throw new IllegalArgumentException("this skill has already added for this worker.");
 
-        WorkerSkill workerSkill= new WorkerSkill(worker,job);
+        WorkerSkill workerSkill = new WorkerSkill(worker, job);
         workerSkillSer.saveOrUpdate(workerSkill);
     }
-
 
 
     private void createPredicates(FilterWorkerDTO filterWorkerDTO, List<Predicate> predicateList, CriteriaBuilder criteriaBuilder, Root<Worker> root) {

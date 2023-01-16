@@ -1,23 +1,17 @@
 package ir.maktab.homeservicecompany.models.client.service;
 
-import ir.maktab.homeservicecompany.models.client.entity.Client;
-import ir.maktab.homeservicecompany.utils.exception.InvalidIdException;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles({})
 class ClientSerImplTest {
     /*
+
     @Autowired
     private ClientService clientSer;
 
@@ -84,9 +78,9 @@ class ClientSerImplTest {
 
     @Test
     void signUpPasswordIssue() {
-        Client client = new Client("farzad", "afshar", "f.afshar1@gmail.com", "1");
+        UserDTO userDTO = new UserDTO("farzad", "afshar", "f.afshar1@gmail.com", "1");
         try {
-            clientSer.signUp(client);
+            clientSer.signUp(userDTO);
         } catch (IllegalArgumentException e) {
             assertEquals("""
                      password must contain at least 1 uppercase or lowercase and 1 digit.
@@ -97,10 +91,11 @@ class ClientSerImplTest {
 
     @Test
     void changePassword() {
-        Client client = new Client("milad","ameri","m.ameri@gmail.com","1234567a");
-        clientSer.signUp(client);
-        clientSer.changePassword(
+        UserDTO userDTO = new UserDTO("milad","ameri","m.ameri@gmail.com","1234567a");
+        clientSer.signUp(userDTO);
+        PasswordDTO passwordDTO = new PasswordDTO(
                 "m.ameri@gmail.com","1234567a","7654321a","7654321a");
+        clientSer.changePassword(passwordDTO);
         assertEquals("7654321a",clientSer.findByEmail("m.ameri@gmail.com").getPassword());
     }
 
@@ -184,7 +179,5 @@ class ClientSerImplTest {
 
     @Test
     void clientCriteria() {
-    }
-
-     */
+    }*/
 }

@@ -1,10 +1,10 @@
 package ir.maktab.homeservicecompany.utils.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
 @AllArgsConstructor
+@Getter
 public class UserDTO {
     private String firstName;
     private String lastName;

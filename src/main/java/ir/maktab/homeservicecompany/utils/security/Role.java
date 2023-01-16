@@ -1,4 +1,4 @@
-package ir.maktab.homeservicecompany.utils.config;
+package ir.maktab.homeservicecompany.utils.security;
 
 public enum Role {
     ROLE_ADMIN,

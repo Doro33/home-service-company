@@ -1,8 +1,10 @@
 package ir.maktab.homeservicecompany.utils.dto;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-@Data
+@AllArgsConstructor
+@Getter
 public class PasswordDTO {
     private String email;
     private String oldPassword;
