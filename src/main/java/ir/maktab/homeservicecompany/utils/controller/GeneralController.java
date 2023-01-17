@@ -13,6 +13,7 @@ import ir.maktab.homeservicecompany.models.worker.service.WorkerService;
 import ir.maktab.homeservicecompany.utils.dto.UserDTO;
 import ir.maktab.homeservicecompany.utils.exception.SaveImageException;
 import ir.maktab.homeservicecompany.utils.validation.Validation;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,22 +43,20 @@ public class GeneralController {
     }
 
     @PostMapping("/clientSignup")
-    public void clientSignUp(@RequestBody UserDTO userDTO) {
+    public void clientSignUp(@Valid @RequestBody UserDTO userDTO) {
         clientSer.signUp(userDTO);
     }
 
     @PostMapping("/workerSignup")
-    public void workerSignUp(@RequestParam("userDTO") String jsonUserDTO, @RequestParam("image") MultipartFile image) {
+    public void workerSignUp(@Valid @RequestParam("userDTO") String jsonUserDTO, @RequestParam("image") MultipartFile image) {
         validation.imageValidate(image);
         ObjectMapper objectMapper = new ObjectMapper();
         UserDTO userDTO;
         try {
             userDTO = objectMapper.readValue(jsonUserDTO, UserDTO.class);
+            workerSer.signUp(userDTO, image.getBytes());
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("request param could not mapped to json.");
-        }
-        try {
-            workerSer.signUp(userDTO, image.getBytes());
         } catch (IOException e) {
             throw new SaveImageException("image cannot be save.");
         }
