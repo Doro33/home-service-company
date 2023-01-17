@@ -13,6 +13,7 @@ import ir.maktab.homeservicecompany.models.worker.entity.Worker;
 import ir.maktab.homeservicecompany.models.worker.service.WorkerService;
 import ir.maktab.homeservicecompany.utils.dto.PasswordDTO;
 import ir.maktab.homeservicecompany.utils.exception.NullIdException;
+import ir.maktab.homeservicecompany.utils.security.config.PasswordConfig;
 import ir.maktab.homeservicecompany.utils.service.UserService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,7 +31,7 @@ public class Validation {
     private final JobService jobSer;
     private final UserService userSer;
 
-    private PasswordEncoder passEncoder;
+    private final PasswordEncoder passEncoder = PasswordConfig.passwordEncoder();
 
     public Validation(@Lazy ClientService clientSer, @Lazy RequestService requestSer, @Lazy WorkerService workerSer,
                       @Lazy OfferService offerSer, @Lazy JobService jobSer, UserService userSer) {
@@ -42,7 +43,11 @@ public class Validation {
         this.userSer = userSer;
     }
     public void imageValidate(MultipartFile image) {
-        String[] choppedName = image.getOriginalFilename().split("\\.");
+        String imageName = image.getOriginalFilename();
+        if (Strings.isNullOrEmpty(imageName))
+            throw new IllegalArgumentException("image name cannot be null");
+
+        String[] choppedName = imageName.split("\\.");
         int lastIndex = choppedName.length - 1;
         if (!Objects.equals(choppedName[lastIndex].toLowerCase(), "jpg")) {
             throw new IllegalArgumentException("image's format must be jpg.");

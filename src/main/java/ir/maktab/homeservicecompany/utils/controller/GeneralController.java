@@ -1,5 +1,6 @@
 package ir.maktab.homeservicecompany.utils.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ir.maktab.homeservicecompany.models.category.entity.Category;
 import ir.maktab.homeservicecompany.models.category.service.CategoryService;
@@ -46,11 +47,16 @@ public class GeneralController {
     }
 
     @PostMapping("/workerSignup")
-    void workerSignUp(@RequestParam("userDTO") String jsonUserDTO, @RequestParam("image") MultipartFile image) {
+    public void workerSignUp(@RequestParam("userDTO") String jsonUserDTO, @RequestParam("image") MultipartFile image) {
         validation.imageValidate(image);
         ObjectMapper objectMapper = new ObjectMapper();
+        UserDTO userDTO;
         try {
-            UserDTO userDTO = objectMapper.readValue(jsonUserDTO, UserDTO.class);
+            userDTO = objectMapper.readValue(jsonUserDTO, UserDTO.class);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("request param could not mapped to json.");
+        }
+        try {
             workerSer.signUp(userDTO, image.getBytes());
         } catch (IOException e) {
             throw new SaveImageException("image cannot be save.");
