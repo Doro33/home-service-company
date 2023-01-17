@@ -28,10 +28,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
+
                 .authorizeHttpRequests()
-                .requestMatchers("/admin/**").hasRole("ROLE_ADMIN")
-                .requestMatchers("/worker/**").hasRole("ROLE_WORKER")
-                .requestMatchers("/client/**").hasRole("ROLE_CLIENT")
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/worker/**").hasRole("WORKER")
+                .requestMatchers("/client/**").hasRole("CLIENT")
                 .requestMatchers("/general/**").permitAll()
                 .anyRequest()
                 .authenticated()

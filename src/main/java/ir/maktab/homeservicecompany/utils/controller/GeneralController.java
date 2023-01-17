@@ -1,8 +1,8 @@
 package ir.maktab.homeservicecompany.utils.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import ir.maktab.homeservicecompany.models.category.entity.Category;
 import ir.maktab.homeservicecompany.models.category.service.CategoryService;
-import ir.maktab.homeservicecompany.models.client.entity.Client;
 import ir.maktab.homeservicecompany.models.client.service.ClientService;
 import ir.maktab.homeservicecompany.models.job.entity.Job;
 import ir.maktab.homeservicecompany.models.job.service.JobService;
@@ -46,10 +46,12 @@ public class GeneralController {
     }
 
     @PostMapping("/workerSignup")
-    void workerSignUp(@RequestBody UserDTO userDTO, @RequestParam("image") MultipartFile image) {
+    void workerSignUp(@RequestParam("userDTO") String jsonUserDTO, @RequestParam("image") MultipartFile image) {
         validation.imageValidate(image);
+        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            workerSer.signUp(userDTO , image.getBytes());
+            UserDTO userDTO = objectMapper.readValue(jsonUserDTO, UserDTO.class);
+            workerSer.signUp(userDTO, image.getBytes());
         } catch (IOException e) {
             throw new SaveImageException("image cannot be save.");
         }
@@ -58,10 +60,5 @@ public class GeneralController {
     @GetMapping("/findRequestsByJob/{id}")
     public List<Request> findRequestsByJobId(@PathVariable Long id){
         return requestSer.findByJob(id);
-    }
-
-    @GetMapping("hi/{email}")
-    public Client findClient(@PathVariable String email){
-        return clientSer.findByEmail(email).get();
     }
 }

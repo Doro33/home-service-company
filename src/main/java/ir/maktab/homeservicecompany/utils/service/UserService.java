@@ -33,10 +33,10 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<Admin> admin = adminSer.findByEmail(username);
-        Optional<Worker> worker = workerSer.findByEmail(username);
-        Optional<Client> client = clientSer.findByEmail(username);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Optional<Admin> admin = adminSer.findByEmail(email);
+        Optional<Worker> worker = workerSer.findByEmail(email);
+        Optional<Client> client = clientSer.findByEmail(email);
         if (admin.isPresent())
             return admin.get();
         if (worker.isPresent())

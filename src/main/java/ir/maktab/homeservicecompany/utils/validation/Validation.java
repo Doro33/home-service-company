@@ -42,7 +42,7 @@ public class Validation {
         this.userSer = userSer;
     }
     public void imageValidate(MultipartFile image) {
-        String[] choppedName = image.getName().split("\\.");
+        String[] choppedName = image.getOriginalFilename().split("\\.");
         int lastIndex = choppedName.length - 1;
         if (!Objects.equals(choppedName[lastIndex].toLowerCase(), "jpg")) {
             throw new IllegalArgumentException("image's format must be jpg.");

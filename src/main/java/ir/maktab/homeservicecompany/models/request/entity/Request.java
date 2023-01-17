@@ -1,5 +1,6 @@
 package ir.maktab.homeservicecompany.models.request.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import ir.maktab.homeservicecompany.utils.base.entity.BaseEntity;
 import ir.maktab.homeservicecompany.models.client.entity.Client;
 import ir.maktab.homeservicecompany.models.job.entity.Job;
@@ -49,6 +50,7 @@ public class Request extends BaseEntity {
     private String address;
     @Enumerated(EnumType.STRING)
     private RequestStatus status;
+    @JsonIgnoreProperties("request")
     @ManyToOne
     @Nullable
     private Offer acceptedOffer;

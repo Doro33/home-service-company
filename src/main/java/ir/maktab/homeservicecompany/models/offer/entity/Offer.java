@@ -1,5 +1,6 @@
 package ir.maktab.homeservicecompany.models.offer.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import ir.maktab.homeservicecompany.models.request.entity.Request;
 import ir.maktab.homeservicecompany.utils.base.entity.BaseEntity;
 import ir.maktab.homeservicecompany.models.worker.entity.Worker;
@@ -31,6 +32,7 @@ public class Offer extends BaseEntity {
 
     @ManyToOne
     private Worker worker;
+    @JsonIgnoreProperties("acceptedOffer")
     @ManyToOne
     private Request request;
     private LocalDateTime createdAt;
