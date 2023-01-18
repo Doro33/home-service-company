@@ -11,6 +11,8 @@ import ir.maktab.homeservicecompany.models.request.entity.Request;
 import ir.maktab.homeservicecompany.models.request.service.RequestService;
 import ir.maktab.homeservicecompany.models.worker.entity.Worker;
 import ir.maktab.homeservicecompany.models.worker.service.WorkerService;
+import ir.maktab.homeservicecompany.models.worker_skill.entity.WorkerSkill;
+import ir.maktab.homeservicecompany.models.worker_skill.service.WorkerSkillService;
 import ir.maktab.homeservicecompany.utils.dto.PasswordDTO;
 import ir.maktab.homeservicecompany.utils.exception.NullIdException;
 import ir.maktab.homeservicecompany.utils.security.config.PasswordConfig;
@@ -29,17 +31,20 @@ public class Validation {
     private final WorkerService workerSer;
     private final OfferService offerSer;
     private final JobService jobSer;
+
+    private final WorkerSkillService workerSkillSer;
     private final UserService userSer;
 
     private final PasswordEncoder passEncoder = PasswordConfig.passwordEncoder();
 
     public Validation(@Lazy ClientService clientSer, @Lazy RequestService requestSer, @Lazy WorkerService workerSer,
-                      @Lazy OfferService offerSer, @Lazy JobService jobSer, UserService userSer) {
+                      @Lazy OfferService offerSer, @Lazy JobService jobSer, WorkerSkillService workerSkillSer, UserService userSer) {
         this.clientSer = clientSer;
         this.requestSer = requestSer;
         this.workerSer = workerSer;
         this.offerSer = offerSer;
         this.jobSer = jobSer;
+        this.workerSkillSer = workerSkillSer;
         this.userSer = userSer;
     }
     public void imageValidate(MultipartFile image) {
@@ -86,6 +91,11 @@ public class Validation {
         return jobSer.findById(jobId);
     }
 
+    public WorkerSkill workerSkillValidation(Long workerSkillId){
+        if (workerSkillId==null)
+            throw new NullIdException("workerSkill's id cannot be null.");
+        return workerSkillSer.findById(workerSkillId);
+    }
     public String checkPasswords(PasswordDTO passwordDTO, String truePassword) {
         String oldPassword = passwordDTO.getOldPassword();
         String newPassword1 = passwordDTO.getNewPassword1();

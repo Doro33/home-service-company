@@ -34,7 +34,6 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
 
     public WorkerSerImpl(WorkerDao repository, WorkerSkillService workerSkillSer, Validation validation) {
         super(repository);
-
         this.workerSkillSer = workerSkillSer;
         this.validation = validation;
     }

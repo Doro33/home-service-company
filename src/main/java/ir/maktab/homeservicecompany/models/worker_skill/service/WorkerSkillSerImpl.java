@@ -5,7 +5,6 @@ import ir.maktab.homeservicecompany.models.worker.entity.WorkerStatus;
 import ir.maktab.homeservicecompany.models.worker_skill.dao.WorkerSkillDao;
 import ir.maktab.homeservicecompany.utils.base.service.BaseServiceImpl;
 import ir.maktab.homeservicecompany.utils.exception.AdminPermitException;
-import ir.maktab.homeservicecompany.utils.exception.NullIdException;
 import ir.maktab.homeservicecompany.models.worker.entity.Worker;
 import ir.maktab.homeservicecompany.models.worker_skill.entity.WorkerSkill;
 import ir.maktab.homeservicecompany.utils.validation.Validation;
@@ -24,9 +23,7 @@ public class WorkerSkillSerImpl extends BaseServiceImpl<WorkerSkill,WorkerSkillD
 
     @Override
     public void permitWorkerSkill(Long id) {
-        if (id==null)
-            throw new NullIdException("workerSkill id cannot be null.");
-        WorkerSkill workerSkill = findById(id);
+        WorkerSkill workerSkill = validation.workerSkillValidation(id);
         if (workerSkill.getWorker().getStatus()!= WorkerStatus.CONFIRMED)
             throw new AdminPermitException("worker must be confirmed first.");
         workerSkill.setConfirmedByAdmin(true);
@@ -35,9 +32,7 @@ public class WorkerSkillSerImpl extends BaseServiceImpl<WorkerSkill,WorkerSkillD
 
     @Override
     public void banWorkerSkill(Long id) {
-        if (id==null)
-            throw new NullIdException("workerSkill id cannot be null.");
-        WorkerSkill workerSkill = findById(id);
+        WorkerSkill workerSkill = validation.workerSkillValidation(id);
         workerSkill.setConfirmedByAdmin(false);
         saveOrUpdate(workerSkill);
     }

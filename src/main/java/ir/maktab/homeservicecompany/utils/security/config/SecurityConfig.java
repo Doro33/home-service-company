@@ -31,8 +31,8 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/client/activateAccount/**").hasRole("NEW_CLIENT")
                 .requestMatchers("/worker/activateAccount/**").hasRole("NEW_WORKER")
+                .requestMatchers("/client/activateAccount/**").hasRole("NEW_CLIENT")
                 .requestMatchers("/worker/**").hasRole("WORKER")
                 .requestMatchers("/client/**").hasRole("CLIENT")
                 .requestMatchers("/general/**").permitAll()

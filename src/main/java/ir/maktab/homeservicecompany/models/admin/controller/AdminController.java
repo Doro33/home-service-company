@@ -33,33 +33,40 @@ public class AdminController {
     private final OfferService offerSer;
 
     @PostMapping("/addCategory")
-    public void addCategory(@RequestBody Category category) {
+    public String addCategory(@RequestBody Category category) {
+
         categorySer.addNewCategory(category.getName());
+        return "category added successfully.";
     }
 
     @PostMapping("/addJob")
-    public void addJob(@RequestBody JobDTO jobDTO) {
+    public String addJob(@RequestBody JobDTO jobDTO) {
         jobSer.addNewJob(jobDTO);
+        return "job added successfully.";
     }
 
     @PutMapping("/updateJob")
-    public void updateJob(@RequestBody JobDTO jobDTO) {
+    public String updateJob(@RequestBody JobDTO jobDTO) {
         jobSer.updateJob(jobDTO);
+        return "job updated successfully.";
     }
 
     @PutMapping("/confirmWorker/{id}")
-    public void confirmWorker(@PathVariable Long id) {
+    public String confirmWorker(@PathVariable Long id) {
         workerSer.confirmWorker(id);
+        return "worker confirmed successfully.";
     }
 
     @PutMapping("/permitWorkerSkill/{id}")
-    public void permitWorkerSkill(@PathVariable Long id) {
+    public String permitWorkerSkill(@PathVariable Long id) {
         workerSkillSer.permitWorkerSkill(id);
+        return "worker allowed to do this job.";
     }
 
     @PutMapping("/banWorkerSkill/{id}")
-    public void banWorkerSkill(@PathVariable Long id) {
+    public String banWorkerSkill(@PathVariable Long id) {
         workerSkillSer.banWorkerSkill(id);
+        return "worker banned to do this job.";
     }
 
     @GetMapping("/showAllClients")
