@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface ClientService extends BaseService<Client> {
     Optional<Client> findByEmail(String email);
 
-    void signUp(UserDTO userDTO);
+    Client signUp(UserDTO userDTO);
 
     void changePassword(PasswordDTO passwordDTO);
     void setRequestStatusOnStarted(Long clientId, Long requestId);
@@ -27,5 +27,7 @@ public interface ClientService extends BaseService<Client> {
     List<Client> clientCriteria(FilterClientDTO filterClientDto);
 
     void increaseCredit(Long clientId, MoneyTransferDTO moneyTransferDTO);
+
+    void activeClient(Long id);
 
 }

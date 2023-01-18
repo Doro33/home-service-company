@@ -21,6 +21,7 @@ import ir.maktab.homeservicecompany.utils.exception.RequestStatusException;
 import ir.maktab.homeservicecompany.models.offer.entity.Offer;
 import ir.maktab.homeservicecompany.models.request.entity.Request;
 import ir.maktab.homeservicecompany.models.worker.entity.Worker;
+import ir.maktab.homeservicecompany.utils.security.Role;
 import ir.maktab.homeservicecompany.utils.validation.Validation;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -68,7 +69,7 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
     }
 
     @Override
-    public void signUp(UserDTO userDTO) {
+    public Client signUp(UserDTO userDTO) {
         String email = userDTO.getEmail();
         validation.emailValidation(email);
         Client client = new Client(
@@ -76,7 +77,7 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
                 userDTO.getLastName(),
                 userDTO.getPassword(),
                 email);
-        saveOrUpdate(client);
+        return saveOrUpdate(client);
     }
 
     @Override
@@ -191,6 +192,15 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         bankCardSer.moneyTransfer(moneyTransferDTO);
 
         client.setCredit(client.getCredit() + amount);
+        saveOrUpdate(client);
+    }
+
+    @Override
+    public void activeClient(Long id) {
+        Client client = validation.clientValidate(id);
+        if (client.getRole() == Role.ROLE_CLIENT)
+            throw new IllegalArgumentException("this account has been activated already.");
+        client.setRole(Role.ROLE_CLIENT);
         saveOrUpdate(client);
     }
 

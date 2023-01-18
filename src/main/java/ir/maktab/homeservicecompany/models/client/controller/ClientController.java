@@ -88,4 +88,9 @@ public class ClientController {
         return requestSer.findByClient(clientId);
     }
 
+    @PutMapping("/activateAccount/{clientId}")
+    public void activateAccount(@PathVariable Long clientId){
+        clientSer.activeClient(clientId);
+    }
+
 }

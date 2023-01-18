@@ -12,6 +12,7 @@ import ir.maktab.homeservicecompany.models.worker.dao.WorkerDao;
 import ir.maktab.homeservicecompany.models.worker.entity.Worker;
 import ir.maktab.homeservicecompany.utils.dto.PasswordDTO;
 import ir.maktab.homeservicecompany.utils.exception.AdminPermitException;
+import ir.maktab.homeservicecompany.utils.security.Role;
 import ir.maktab.homeservicecompany.utils.validation.Validation;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -60,7 +61,7 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
 
 
     @Override
-    public void signUp(UserDTO userDTO, byte[] image) {
+    public Worker signUp(UserDTO userDTO, byte[] image) {
         String email = userDTO.getEmail();
         validation.emailValidation(email);
 
@@ -70,7 +71,7 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
                 userDTO.getPassword(),
                 email,
                 image);
-        saveOrUpdate(worker);
+        return saveOrUpdate(worker);
     }
 
     @Override
@@ -109,6 +110,15 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
 
         WorkerSkill workerSkill = new WorkerSkill(worker, job);
         workerSkillSer.saveOrUpdate(workerSkill);
+    }
+
+    @Override
+    public void activeWorker(Long id) {
+        Worker worker = validation.workerValidate(id);
+        if (worker.getRole() == Role.ROLE_WORKER)
+            throw new IllegalArgumentException("this account has been activated already.");
+        worker.setRole(Role.ROLE_WORKER);
+        saveOrUpdate(worker);
     }
 
 

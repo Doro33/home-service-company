@@ -16,12 +16,15 @@ public interface WorkerService extends BaseService<Worker> {
     void changePassword(PasswordDTO passwordDTO);
 
 
-    void signUp(UserDTO userDTO, byte[] image);
+    Worker signUp(UserDTO userDTO, byte[] image);
 
     void confirmWorker(Long id);
 
     List<Worker> workerCriteria(FilterWorkerDTO filterWorkerDTO);
 
     void addSkill(Long workerId,Long jobId);
+
+    void activeWorker(Long id);
+
 
 }

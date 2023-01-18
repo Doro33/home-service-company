@@ -49,4 +49,9 @@ public class WorkerController {
     public List<Offer> showWorkerOffers(@PathVariable Long workerId){
         return offerSer.findByWorker(workerId);
     }
+
+    @PutMapping("/activateAccount/{workerId}")
+    public void activateAccount(@PathVariable Long workerId){
+        workerSer.activeWorker(workerId);
+    }
 }

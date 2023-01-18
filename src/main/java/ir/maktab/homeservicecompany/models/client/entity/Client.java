@@ -35,7 +35,7 @@ public class Client extends BaseEntity implements UserDetails {
         this.createdAt = LocalDateTime.now();
         this.credit = 0D;
         this.requestCounter = 0;
-        this.setRole(Role.ROLE_CLIENT);
+        this.setRole(Role.ROLE_NEW_CLIENT);
     }
 
     private String firstName;

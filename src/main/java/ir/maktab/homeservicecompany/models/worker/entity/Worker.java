@@ -38,7 +38,7 @@ public class Worker extends BaseEntity implements UserDetails {
         this.commentCounter = 0;
         this.offerCounter = 0;
         this.completedTaskCounter =0;
-        this.role=Role.ROLE_WORKER;
+        this.role=Role.ROLE_NEW_WORKER;
     }
 
     private String firstName;
