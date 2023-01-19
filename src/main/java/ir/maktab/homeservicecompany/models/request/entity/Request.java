@@ -1,6 +1,7 @@
 package ir.maktab.homeservicecompany.models.request.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import ir.maktab.homeservicecompany.models.category.entity.Category;
 import ir.maktab.homeservicecompany.utils.base.entity.BaseEntity;
 import ir.maktab.homeservicecompany.models.client.entity.Client;
 import ir.maktab.homeservicecompany.models.job.entity.Job;
@@ -27,6 +28,7 @@ public class Request extends BaseEntity {
     public Request(Client client, Job job, Double proposedPrice, String description,
                    LocalDate date, LocalTime suggestedTime, String address) {
         this.client = client;
+        this.category = job.getCategory();
         this.job = job;
         this.proposedPrice = proposedPrice;
         this.description = description;
@@ -39,6 +41,8 @@ public class Request extends BaseEntity {
 
     @ManyToOne
     private Client client;
+    @ManyToOne
+    private Category category;
     @ManyToOne
     private Job job;
     @Positive

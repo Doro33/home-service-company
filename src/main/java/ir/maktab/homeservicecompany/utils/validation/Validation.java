@@ -1,6 +1,8 @@
 package ir.maktab.homeservicecompany.utils.validation;
 
 import com.google.common.base.Strings;
+import ir.maktab.homeservicecompany.models.category.entity.Category;
+import ir.maktab.homeservicecompany.models.category.service.CategoryService;
 import ir.maktab.homeservicecompany.models.client.entity.Client;
 import ir.maktab.homeservicecompany.models.client.service.ClientService;
 import ir.maktab.homeservicecompany.models.job.entity.Job;
@@ -30,6 +32,7 @@ public class Validation {
     private final RequestService requestSer;
     private final WorkerService workerSer;
     private final OfferService offerSer;
+    private final CategoryService categorySer;
     private final JobService jobSer;
 
     private final WorkerSkillService workerSkillSer;
@@ -38,11 +41,12 @@ public class Validation {
     private final PasswordEncoder passEncoder = PasswordConfig.passwordEncoder();
 
     public Validation(@Lazy ClientService clientSer, @Lazy RequestService requestSer, @Lazy WorkerService workerSer,
-                      @Lazy OfferService offerSer, @Lazy JobService jobSer, WorkerSkillService workerSkillSer, UserService userSer) {
+                      @Lazy OfferService offerSer, CategoryService categorySer, @Lazy JobService jobSer, WorkerSkillService workerSkillSer, UserService userSer) {
         this.clientSer = clientSer;
         this.requestSer = requestSer;
         this.workerSer = workerSer;
         this.offerSer = offerSer;
+        this.categorySer = categorySer;
         this.jobSer = jobSer;
         this.workerSkillSer = workerSkillSer;
         this.userSer = userSer;
@@ -83,6 +87,12 @@ public class Validation {
         if (offerId == null)
             throw new NullIdException("offer's id cannot be null.");
         return offerSer.findById(offerId);
+    }
+
+    public Category categoryValidate(Long categoryId){
+        if (categoryId == null)
+            throw new NullIdException("category's id cannot be null.");
+        return categorySer.findById(categoryId);
     }
 
     public Job jobValidate(Long jobId) {
