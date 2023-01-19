@@ -3,6 +3,8 @@ package ir.maktab.homeservicecompany.models.worker.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.time.LocalDate;
+
 @Getter
 @AllArgsConstructor
 public class FilterWorkerDTO {
@@ -13,4 +15,6 @@ public class FilterWorkerDTO {
     private Long maxScore;
     private Integer minCompletedTask;
     private Integer maxCompletedTask;
+    private LocalDate signupAfter;
+    private LocalDate signupBefore;
 }

@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -235,6 +236,7 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
                     .like(root.get("email"), sampleMaker(email)));
         }
         requestNumberPredicateMaker(filterClientDto, predicateList, criteriaBuilder, root);
+        signupDatePredicateMaker(filterClientDto,predicateList,criteriaBuilder,root);
     }
 
     private static void requestNumberPredicateMaker(FilterClientDTO filterClientDto,
@@ -253,7 +255,19 @@ public class ClientSerImpl extends BaseServiceImpl<Client, ClientDao> implements
         predicateList.add(criteriaBuilder.
                 between(root.get("requestCounter"), minRequestNumber, maxRequestNumber));
     }
-
+    private static void signupDatePredicateMaker(FilterClientDTO filterClientDto,
+                                                 List<Predicate> predicateList, CriteriaBuilder criteriaBuilder,
+                                                 Root<Client> root){
+        LocalDate signupAfter =filterClientDto.getSignupAfter();
+        LocalDate signupBefore = filterClientDto.getSignupBefore();
+        if (signupAfter == null)
+            signupAfter = LocalDate.MIN;
+        if (signupBefore == null)
+            signupBefore = LocalDate.now();
+        if (signupBefore.isBefore(signupAfter))
+            throw new IllegalArgumentException("signup before date cannot be before signup after date");
+        predicateList.add(criteriaBuilder.between(root.get("createdAt"), signupAfter, signupBefore));
+    }
     private String sampleMaker(String input) {
         return "%" + input + "%";
     }

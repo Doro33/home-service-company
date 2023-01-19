@@ -54,7 +54,8 @@ public class GeneralController {
     }
 
     @PostMapping("/workerSignup")
-    public String workerSignUp(@Valid @RequestParam("userDTO") String jsonUserDTO, @RequestParam("image") MultipartFile image) {
+    public String workerSignUp(@Valid @RequestParam("userDTO") String jsonUserDTO,
+                               @RequestParam("image") MultipartFile image) {
         validation.imageValidate(image);
         ObjectMapper objectMapper = new ObjectMapper();
         UserDTO userDTO;

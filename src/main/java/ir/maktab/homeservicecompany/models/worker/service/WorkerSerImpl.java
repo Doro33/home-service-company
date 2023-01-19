@@ -22,6 +22,7 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -141,6 +142,7 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
         }
         scorePredicateMaker(filterWorkerDTO, predicateList, criteriaBuilder, root);
         completedTaskPredicateMaker(filterWorkerDTO,predicateList,criteriaBuilder,root);
+        signupDatePredicateMaker(filterWorkerDTO,predicateList,criteriaBuilder,root);
     }
 
     private String sampleMaker(String input) {
@@ -175,5 +177,19 @@ public class WorkerSerImpl extends BaseServiceImpl<Worker, WorkerDao> implements
             throw new IllegalArgumentException("min completed tasks cannot be lesser than 0.");
         predicateList.add(criteriaBuilder.
                 between(root.get("completedTaskCounter"), minCompletedTask, maxCompletedTask));
+    }
+
+    private static void signupDatePredicateMaker(FilterWorkerDTO filterWorkerDTO,
+                                                 List<Predicate> predicateList, CriteriaBuilder criteriaBuilder,
+                                                 Root<Worker> root){
+        LocalDate signupAfter =filterWorkerDTO.getSignupAfter();
+        LocalDate signupBefore = filterWorkerDTO.getSignupBefore();
+        if (signupAfter == null)
+            signupAfter = LocalDate.MIN;
+        if (signupBefore == null)
+            signupBefore = LocalDate.now();
+        if (signupBefore.isBefore(signupAfter))
+            throw new IllegalArgumentException("signup before date cannot be before signup after date");
+        predicateList.add(criteriaBuilder.between(root.get("createdAt"), signupAfter, signupBefore));
     }
 }
