@@ -27,13 +27,15 @@ public class ClientController {
     private final CommentService commentSer;
 
     @PutMapping("/changePassword")
-    public void changePassword(@RequestBody PasswordDTO passwordDTO) {
+    public String changePassword(@RequestBody PasswordDTO passwordDTO) {
         clientSer.changePassword(passwordDTO);
+        return "your password updated successfully.";
     }
 
     @PostMapping("/addRequest")
-    public void addRequest(@RequestBody RequestDTO requestDTO){
+    public String addRequest(@RequestBody RequestDTO requestDTO){
         requestSer.saveNewRequest(requestDTO);
+        return "your request added successfully.";
     }
 
     @GetMapping("/findOffersOrderByPrice/{requestId}")
@@ -49,33 +51,42 @@ public class ClientController {
     }
 
     @PostMapping("/chooseAnOffer")
-    public void chooseAnOffer(@RequestBody ChooseOfferDTO chooseOfferDTO){
+    public String chooseAnOffer(@RequestBody ChooseOfferDTO chooseOfferDTO){
         clientSer.chooseAnOffer(chooseOfferDTO);
+        return """
+                offer chose successfully.
+                the worker is on the road.
+                """;
     }
 
     @PutMapping("/setRequestStatusOnStarted/{clientId}/{requestId}")
-    public void setRequestStatusOnStarted(@PathVariable Long clientId,@PathVariable Long requestId){
+    public String setRequestStatusOnStarted(@PathVariable Long clientId,@PathVariable Long requestId){
         clientSer.setRequestStatusOnStarted(clientId,requestId);
+        return "request started successfully";
     }
 
     @PutMapping("/setRequestStatusOnCompleted/{clientId}/{requestId}")
-    public void setRequestStatusOnCompleted(@PathVariable Long clientId,@PathVariable Long requestId){
+    public String setRequestStatusOnCompleted(@PathVariable Long clientId,@PathVariable Long requestId){
         clientSer.setRequestStatusOnCompleted(clientId,requestId);
+        return "request completed successfully";
     }
 
     @PutMapping("/payWithCredit/{clientId}/{requestId}")
-    public void payWithCredit(@PathVariable Long clientId,@PathVariable Long requestId){
+    public String payWithCredit(@PathVariable Long clientId,@PathVariable Long requestId){
         clientSer.payWithCredit(clientId,requestId);
+        return "request paid successfully";
     }
 
     @PostMapping("/addComment")
-    public void addComment(@RequestBody CommentDTO commentDTO){
+    public String addComment(@RequestBody CommentDTO commentDTO){
         commentSer.addComment(commentDTO);
+        return "comment added successfully";
     }
 
     @PutMapping("/increaseCredit/{clientId}")
-    public void increaseCredit(@PathVariable Long clientId,@RequestBody MoneyTransferDTO moneyTransferDTO){
+    public String increaseCredit(@PathVariable Long clientId,@RequestBody MoneyTransferDTO moneyTransferDTO){
         clientSer.increaseCredit(clientId,moneyTransferDTO);
+        return "your credit increased successfully";
     }
 
     @GetMapping("/showCredit/{clientId}")
@@ -89,8 +100,13 @@ public class ClientController {
     }
 
     @PutMapping("/activateAccount/{clientId}")
-    public void activateAccount(@PathVariable Long clientId){
+    public String activateAccount(@PathVariable Long clientId){
         clientSer.activeClient(clientId);
+        return """
+                your account is active now.
+                you are able to use all our services.
+                hope you enjoy.
+                """;
     }
 
 }

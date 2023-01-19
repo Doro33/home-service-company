@@ -20,19 +20,26 @@ public class WorkerController {
 
     @PutMapping("/changePassword")
     @ResponseBody
-    void changePassword(@RequestBody PasswordDTO passwordDTO) {
+    public String changePassword(@RequestBody PasswordDTO passwordDTO) {
         workerSer.changePassword(passwordDTO);
+        return "your password updated successfully.";
     }
 
     @PostMapping("/addSkill")
     @ResponseBody
-    void addSkill(@RequestBody WorkerSkillDTO workerSkillDTO){
+    public String addSkill(@RequestBody WorkerSkillDTO workerSkillDTO){
         workerSer.addSkill(workerSkillDTO.getWorkerId(), workerSkillDTO.getJobId());
+        return """
+                this skill added to your resume successfully.
+                admin must confirm your information first.
+                after that, you will be able to add an offer for this job's requests.
+                """;
     }
 
     @PostMapping("/addOffer")
-    public void addOffer(@RequestBody OfferDTO offerDTO){
+    public String addOffer(@RequestBody OfferDTO offerDTO){
         offerSer.saveNewOffer(offerDTO);
+        return "offer added successfully.";
     }
 
     @GetMapping("/showScore/{workerId}")
@@ -51,7 +58,12 @@ public class WorkerController {
     }
 
     @PutMapping("/activateAccount/{workerId}")
-    public void activateAccount(@PathVariable Long workerId){
+    public String activateAccount(@PathVariable Long workerId){
         workerSer.activeWorker(workerId);
+        return """
+                your account is active now.
+                you are able to add your skills in your resume.
+                wish you the best.
+                """;
     }
 }
