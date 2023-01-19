@@ -9,6 +9,7 @@ import ir.maktab.homeservicecompany.models.job.dto.JobDTO;
 import ir.maktab.homeservicecompany.models.job.service.JobService;
 import ir.maktab.homeservicecompany.models.offer.entity.Offer;
 import ir.maktab.homeservicecompany.models.offer.service.OfferService;
+import ir.maktab.homeservicecompany.models.request.dto.FilterRequestDTO;
 import ir.maktab.homeservicecompany.models.request.entity.Request;
 import ir.maktab.homeservicecompany.models.request.service.RequestService;
 import ir.maktab.homeservicecompany.models.worker.dto.FilterWorkerDTO;
@@ -102,5 +103,10 @@ public class AdminController {
     @GetMapping("/workersFilter")
     public List<Worker> workersFilter(@RequestBody FilterWorkerDTO filterWorkerDTO) {
         return workerSer.workerCriteria(filterWorkerDTO);
+    }
+
+    @GetMapping("/requestsFilter")
+    public List<Request> requestsFilter(@RequestBody FilterRequestDTO failedRequestFilter){
+        return requestSer.requestCriteria(failedRequestFilter);
     }
 }

@@ -48,7 +48,7 @@ public class RequestSerImpl extends BaseServiceImpl<Request, RequestDao> impleme
         Request request = requestMaker(requestDTO, client, job);
 
         client.setRequestCounter(
-                client.getRequestCounter()+1
+                client.getRequestCounter() + 1
         );
         clientSer.saveOrUpdate(client);
         saveOrUpdate(request);
@@ -62,7 +62,7 @@ public class RequestSerImpl extends BaseServiceImpl<Request, RequestDao> impleme
 
     @Override
     public List<Request> findByClient(Long clientId) {
-        Client client= validation.clientValidate(clientId);
+        Client client = validation.clientValidate(clientId);
         return repository.findByClient(client);
     }
 
@@ -72,7 +72,7 @@ public class RequestSerImpl extends BaseServiceImpl<Request, RequestDao> impleme
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Request> query = criteriaBuilder.createQuery(Request.class);
         Root<Request> root = query.from(Request.class);
-        predicateMaker(filterRequestDTO,predicateList,criteriaBuilder,root);
+        predicateMaker(filterRequestDTO, predicateList, criteriaBuilder, root);
         Predicate[] predicates = new Predicate[predicateList.size()];
         predicateList.toArray(predicates);
         query.select(root).where(predicates);
@@ -84,9 +84,9 @@ public class RequestSerImpl extends BaseServiceImpl<Request, RequestDao> impleme
             throw new IllegalArgumentException("propose price must be at least." + job.getMinimumPrice());
         if (requestDTO.getDate().isBefore(LocalDate.now()))
             throw new IllegalArgumentException("past date cannot be chosen.");
-        if (requestDTO.getDate().isEqual(LocalDate.now())&&
+        if (requestDTO.getDate().isEqual(LocalDate.now()) &&
                 requestDTO.getSuggestedTime().isBefore(LocalTime.now().plusMinutes(30)))
-                throw new IllegalArgumentException("request's suggested time must be at least 30 minuets later from now.");
+            throw new IllegalArgumentException("request's suggested time must be at least 30 minuets later from now.");
         return new Request(client, job,
                 requestDTO.getProposedPrice(),
                 requestDTO.getDescription(),
@@ -112,12 +112,13 @@ public class RequestSerImpl extends BaseServiceImpl<Request, RequestDao> impleme
         if (status != null) {
             predicateList.add(criteriaBuilder.equal(root.get("status"), status));
         }
-        requestDatePredicateMaker(filterRequestDTO,predicateList,criteriaBuilder,root);
+        requestDatePredicateMaker(filterRequestDTO, predicateList, criteriaBuilder, root);
     }
+
     private static void requestDatePredicateMaker(FilterRequestDTO filterRequestDTO,
-                                                 List<Predicate> predicateList, CriteriaBuilder criteriaBuilder,
-                                                 Root<Request> root){
-        LocalDate requestedAfter =filterRequestDTO.getRequestedAfter();
+                                                  List<Predicate> predicateList, CriteriaBuilder criteriaBuilder,
+                                                  Root<Request> root) {
+        LocalDate requestedAfter = filterRequestDTO.getRequestedAfter();
         LocalDate requestedBefore = filterRequestDTO.getRequestedBefore();
         if (requestedAfter == null)
             requestedAfter = LocalDate.MIN;
@@ -127,8 +128,9 @@ public class RequestSerImpl extends BaseServiceImpl<Request, RequestDao> impleme
             throw new IllegalArgumentException("requestedBefore date cannot be before requestedAfter date");
         predicateList.add(criteriaBuilder.between(root.get("date"), requestedAfter, requestedBefore));
     }
+
     private void jobCategoryValidate(Long categoryId, Long jobId) {
-        if (jobId != null && categoryId != null){
+        if (jobId != null && categoryId != null) {
             Category category = validation.categoryValidate(categoryId);
             Job job = validation.jobValidate(jobId);
             if (job.getCategory() != category)

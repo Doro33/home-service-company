@@ -41,7 +41,7 @@ public class Validation {
     private final PasswordEncoder passEncoder = PasswordConfig.passwordEncoder();
 
     public Validation(@Lazy ClientService clientSer, @Lazy RequestService requestSer, @Lazy WorkerService workerSer,
-                      @Lazy OfferService offerSer, CategoryService categorySer, @Lazy JobService jobSer, WorkerSkillService workerSkillSer, UserService userSer) {
+                      @Lazy OfferService offerSer, CategoryService categorySer, @Lazy JobService jobSer,@Lazy WorkerSkillService workerSkillSer, UserService userSer) {
         this.clientSer = clientSer;
         this.requestSer = requestSer;
         this.workerSer = workerSer;
