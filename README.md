@@ -1,7 +1,7 @@
 # home-service-company
 Hello dear viewer.
 I'm glad you are visiting my very first project using Spring Boot.
-This project can be used as an api for a home-service company.
+This project can be used as a back-end layer for a home-service company.
 I would be honored to explain how it works.
 There are 3 types of users, admin, client and worker.
 
