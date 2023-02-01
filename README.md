@@ -5,7 +5,7 @@ This project can be used as a back-end layer for a home-service company.
 I would be honored to explain how it works.
 There are 3 types of users, admin, client and worker.
 
-### Admin: (AdminController)
+## Admin: (AdminController)
 Obviously admin has been defined in Data Base already.
 Admin is in charge of adding categories and jobs.
 Admin is able to confirm workers, and their skills. 
