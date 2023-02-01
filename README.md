@@ -36,7 +36,7 @@ Workers also can see the history of their offers and their credit.
 
 ##
 In this project I used BCryptPasswordEncoder (Hashing) as password encoder.
-I also customized the GlobalExceptionHandler (you can found it at utils.exception.handler).
+I also customized the GlobalExceptionHandler (you can find it at utils.exception.handler).
 
 Thank you for reading this text.
 Hope you enjoy my coding.
