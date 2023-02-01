@@ -34,6 +34,7 @@ and decreased whenever the task takes longer than what they said in their offer.
 If the score is less than zero, the worker will be suspended and he cannot work anymore.
 Workers also can see the history of their offers and their credit.
 
+##
 In this project I used BCryptPasswordEncoder (Hashing) as password encoder.
 I also customized the GlobalExceptionHandler (you can found it at utils.exception.handler).
 
