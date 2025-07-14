@@ -21,12 +21,12 @@ import ir.maktab.homeservicecompany.utils.security.config.PasswordConfig;
 import ir.maktab.homeservicecompany.utils.service.UserService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Objects;
 
-@Service
+@Component
 public class Validation {
     private final ClientService clientSer;
     private final RequestService requestSer;

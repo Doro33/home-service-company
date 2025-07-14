@@ -14,7 +14,7 @@
     <name>home-service-company</name>
     <description>Demo project for Spring Boot</description>
     <properties>
-        <java.version>19</java.version>
+        <java.version>17</java.version>
     </properties>
     <dependencies>
         <dependency>
@@ -92,6 +92,33 @@
             <artifactId>spring-boot-starter-mail</artifactId>
 
         </dependency>
+
+        <!--Logging dependencies
+        these are unnecessary because spring.boot.starter has Logback inside itself
+        -->
+        <!--
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.23.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.23.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j2-impl</artifactId>
+            <version>2.23.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+            <version>3.5.3</version>
+        </dependency>
+         -->
     </dependencies>
 
     <build>
